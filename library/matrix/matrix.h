@@ -1,8 +1,5 @@
-//
-// Created by vps on 6/12/25.
-//
+#pragma once
+#include "storage.h"
+#include "sparse/sparse_matrix.h"
 
-#ifndef MATRIX_H
-#define MATRIX_H
-
-#endif //MATRIX_H
+namespace linalg_lib {}  // namespace linalg_lib

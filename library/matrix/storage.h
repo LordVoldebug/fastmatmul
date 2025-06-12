@@ -1,8 +1,6 @@
-//
-// Created by vps on 6/12/25.
-//
+#pragma once
 
-#ifndef STORAGE_H
-#define STORAGE_H
+namespace linalg_lib {
 
-#endif //STORAGE_H
+namespace detail {}  // namespace detail
+}  // namespace linalg_lib

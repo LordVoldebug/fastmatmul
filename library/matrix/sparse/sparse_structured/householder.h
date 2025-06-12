@@ -1,8 +1,6 @@
-//
-// Created by vps on 6/12/25.
-//
+#pragma once
 
-#ifndef HOUSEHOLDER_H
-#define HOUSEHOLDER_H
+namespace linalg_lib {
 
-#endif //HOUSEHOLDER_H
+namespace detail {}  // namespace detail
+}  // namespace linalg_lib

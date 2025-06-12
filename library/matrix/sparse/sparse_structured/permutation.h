@@ -1,8 +1,6 @@
-//
-// Created by vps on 6/12/25.
-//
+#pragma once
 
-#ifndef PERMUTATION_H
-#define PERMUTATION_H
+namespace linalg_lib {
 
-#endif //PERMUTATION_H
+namespace detail {}  // namespace detail
+}  // namespace linalg_lib

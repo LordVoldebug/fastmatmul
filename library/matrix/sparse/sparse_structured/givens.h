@@ -1,8 +1,6 @@
-//
-// Created by vps on 6/12/25.
-//
+#pragma once
 
-#ifndef GIVENS_H
-#define GIVENS_H
+namespace linalg_lib {
 
-#endif //GIVENS_H
+namespace detail {}  // namespace detail
+}  // namespace linalg_lib

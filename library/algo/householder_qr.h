@@ -1,8 +1,6 @@
-//
-// Created by vps on 6/12/25.
-//
+#pragma once
+#include "matrix/matrix.h"
 
-#ifndef HOUSEHOLDER_QR_H
-#define HOUSEHOLDER_QR_H
+namespace linalg_lib {
 
-#endif //HOUSEHOLDER_QR_H
+} // namespace linalg_lib

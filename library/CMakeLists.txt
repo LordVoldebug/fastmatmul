@@ -1,7 +1,17 @@
-add_library(fastmatmul INTERFACE)
+add_library(linalg_lib INTERFACE)
 
-target_include_directories(fastmatmul
+file(GLOB_RECURSE LINALG_HEADERS
+        CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+)
+
+target_sources(linalg_lib
         INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${vectorclass_SOURCE_DIR}
+        ${LINALG_HEADERS}
+)
+
+target_include_directories(linalg_lib
+        INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>
 )
