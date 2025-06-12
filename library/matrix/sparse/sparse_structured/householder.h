@@ -1,6 +1,5 @@
 #pragma once
 
-namespace linalg_lib {
+namespace linalg_lib::detail {
 
-namespace detail {}  // namespace detail
 }  // namespace linalg_lib
