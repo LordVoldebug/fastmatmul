@@ -16,7 +16,7 @@ public:
     assert(cols >= 0);
   }
 
-  auto&& operator()(this auto&& self, Index row, Index col) {
+  auto&& operator()(this auto&& self, Index row, Index col) noexcept {
     assert(0 <= row && row < rows_);
     assert(0 <= col && col < cols_);
 
@@ -24,19 +24,19 @@ public:
     return self.data_[position];
   }
 
-  Size Rows() const {
+  Size Rows() const noexcept {
     return rows_;
   }
 
-  Size Cols() const {
+  Size Cols() const noexcept {
     return cols_;
   }
 
-  auto begin() { // NOLINT
+  auto begin() noexcept { // NOLINT
     return data_.begin();
   }
 
-  auto end() { // NOLINT
+  auto end() noexcept { // NOLINT
     return data_.end();
   }
 
