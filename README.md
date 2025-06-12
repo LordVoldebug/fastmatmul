@@ -1,2 +1,4 @@
-# fastmatmul
-Course work first year masters HSE
+# linalg_lib
+
+Course work first year Data Science masters HSE, Kaurkin Vladimir
+
