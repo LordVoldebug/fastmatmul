@@ -32,6 +32,14 @@ public:
     return cols_;
   }
 
+  auto begin() { // NOLINT
+    return data_.begin();
+  }
+
+  auto end() { // NOLINT
+    return data_.end();
+  }
+
 private:
   Size rows_ = 0;
   Size cols_ = 0;
