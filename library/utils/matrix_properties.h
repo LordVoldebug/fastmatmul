@@ -3,13 +3,19 @@
 
 namespace linalg_lib::detail {
 
+
 template<typename MatrixElement>
-bool IsOrthogonal(Matrix<MatrixElement> A) {
+bool IsDiagonal(const Matrix<MatrixElement>& A) {
   return false;
 }
 
 template<typename MatrixElement>
-bool IsHessenberg(Matrix<MatrixElement> A) {
+bool IsOrthogonal(const Matrix<MatrixElement>& A) {
+  return IsDiagonal(A * A.Transpose());
+}
+
+template<typename MatrixElement>
+bool IsHessenberg(const Matrix<MatrixElement>& A) {
   return false;
 }
 

@@ -51,6 +51,10 @@ public:
     return ret;
   }
 
+  Matrix Transpose() const {
+    // TODO Iteration
+  }
+
   friend Matrix operator*(const Matrix& a, const Matrix& b) {
     Matrix res(a.Rows(), b.Cols());
     // TODO Iteration
