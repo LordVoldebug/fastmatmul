@@ -96,16 +96,16 @@ public:
 
   friend std::ostream& operator <<(std::ostream& out, const Matrix& matrix) {
     out << '{';
-    for (Index row = 0; row < Rows(); ++row) {
+    for (Index row = 0; row < matrix.Rows(); ++row) {
       if (row != 0) {
         out << ',' << '\n';
       }
       out << "{";
-      for (Index col = 0; col < Cols(); ++col) {
+      for (Index col = 0; col < matrix.Cols(); ++col) {
         if (col != 0) {
-          out << ', ' << ' ';
+          out << ',' << ' ';
         }
-        out << storage_(row, col);
+        out << matrix(row, col);
       }
       out << '}';
     }

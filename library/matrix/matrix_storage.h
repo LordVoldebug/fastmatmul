@@ -16,10 +16,10 @@ public:
   }
 
   auto&& operator()(this auto&& self, Index row, Index col) noexcept {
-    assert(0 <= row && row < Rows());
-    assert(0 <= col && col < Cols());
+    assert(0 <= row && row < self.Rows());
+    assert(0 <= col && col < self.Cols());
 
-    Index position = row * Cols() + col;
+    Index position = row * self.Cols() + col;
     return self.data_[position];
   }
 
