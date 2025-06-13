@@ -2,6 +2,7 @@
 #include <ranges>
 #include <ostream>
 #include "matrix_storage.h"
+#include "utils/arithmetics.h"
 
 namespace linalg_lib {
 template <typename MatrixElement>
@@ -10,8 +11,32 @@ public:
   using Index = typename detail::MatrixStorage<MatrixElement>::Index;
   using Size = typename detail::MatrixStorage<MatrixElement>::Size;
 
+  Matrix() = default;
+
   Matrix(Size rows, Size cols) : storage_(rows, cols) {
   }
+
+  explicit Matrix(Size rows) : storage_(rows, rows) {
+  }
+
+  static Matrix Unit(Size rows) {
+    Matrix res(rows);
+    for (Index row = 0; row < rows; ++row) {
+      res(row, row) = MatrixElement(1);
+    }
+    return res;
+  }
+
+  Matrix(std::initializer_list<std::initializer_list<MatrixElement>> data) :
+    storage_(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
+    for (Index row = 0; row < storage_.Rows(); ++row) {
+      assert(data.begin()[row].size() == storage_.Cols());
+      for (Index col = 0; col < storage_.Cols(); ++col) {
+        storage_(row, col) = data.begin()[row].begin()[col];
+      }
+    }
+  }
+
 
   auto&& operator()(this auto&& self, Index row, Index col) {
     return self.storage_(row, col);
@@ -25,11 +50,11 @@ public:
     return storage_.Cols();
   }
 
-  Matrix& operator+=(const Matrix& other) {
-    assert(DimensionMatches(other));
+  Matrix& operator+=(const Matrix& rhs) {
+    assert(DimensionMatches(rhs));
     for (Index row = 0; row < Rows(); ++row) {
       for (Index col = 0; col < Cols(); ++col) {
-        (*this)(row, col) += other(row, col);
+        (*this)(row, col) += rhs(row, col);
       }
     }
     return *this;
@@ -40,11 +65,11 @@ public:
     return lhs;
   }
 
-  Matrix& operator -=(const Matrix& other) {
-    assert(DimensionMatches(other));
+  Matrix& operator -=(const Matrix& rhs) {
+    assert(DimensionMatches(rhs));
     for (Index row = 0; row < Rows(); ++row) {
       for (Index col = 0; col < Cols(); ++col) {
-        (*this)(row, col) -= other(row, col);
+        (*this)(row, col) -= rhs(row, col);
       }
     }
     return *this;
@@ -77,11 +102,11 @@ public:
 
   friend Matrix operator*(const Matrix& lhs, const Matrix& rhs) {
     assert(lhs.Cols() == rhs.Rows());
-    Matrix res(lhs.Rows(), lhs.Cols());
+    Matrix res(lhs.Rows(), rhs.Cols());
     for (Index res_row = 0; res_row < lhs.Rows(); ++res_row) {
       for (Index res_col = 0; res_col < rhs.Cols(); ++res_col) {
         for (Index res_iter = 0; res_iter < lhs.Cols(); ++res_iter) {
-          res(res_col, res_row) += lhs(res_row, res_iter) * rhs(
+          res(res_row, res_col) += lhs(res_row, res_iter) * rhs(
               res_iter, res_col);
         }
       }
@@ -89,16 +114,31 @@ public:
     return res;
   }
 
-  Matrix& operator*=(const Matrix& other) {
-    *this = std::move((*this) * other);
+  Matrix& operator*=(const Matrix& rhs) {
+    *this = std::move((*this) * rhs);
     return *this;
   }
 
-  friend std::ostream& operator <<(std::ostream& out, const Matrix& matrix) {
+  bool operator==(const Matrix& rhs) const {
+    if (!DimensionMatches(rhs)) {
+      return false;
+    }
+    for (Index row = 0; row < Rows(); ++row) {
+      for (Index col = 0; col < Cols(); ++col) {
+        if (!detail::IsCloseToZero((*this)(row, col) - rhs(row, col))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
     out << '{';
     for (Index row = 0; row < matrix.Rows(); ++row) {
       if (row != 0) {
-        out << ',' << '\n';
+        out << ',' << '\n' << ' '; // сомневался, не лучше ли выводить строку
+        // но логически показалось что лучше по символам (в выводе +- за разное отвечают)
       }
       out << "{";
       for (Index col = 0; col < matrix.Cols(); ++col) {
@@ -114,8 +154,8 @@ public:
   }
 
 private:
-  bool DimensionMatches(const Matrix& other) {
-    return Rows() == other.Rows() && Cols() == other.Cols();
+  bool DimensionMatches(const Matrix& rhs) const {
+    return Rows() == rhs.Rows() && Cols() == rhs.Cols();
   }
 
 private:
