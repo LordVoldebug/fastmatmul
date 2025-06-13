@@ -31,14 +31,6 @@ public:
     return std::ssize(data_) / Cols();
   }
 
-  auto begin() noexcept { // NOLINT
-    return data_.begin();
-  }
-
-  auto end() noexcept { // NOLINT
-    return data_.end();
-  }
-
 private:
   Size cols_ = 0;
   std::vector<MatrixElement> data_;

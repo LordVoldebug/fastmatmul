@@ -26,7 +26,12 @@ public:
   }
 
   Matrix& operator+=(const Matrix& other) {
-    // TODO Iteration
+    assert(DimensionMatches(other));
+    for (Index row = 0; row < Rows(); ++row) {
+      for (Index col = 0; col < Cols(); ++col) {
+        (*this)(row, col) += other(row, col);
+      }
+    }
     return *this;
   }
 
@@ -36,7 +41,12 @@ public:
   }
 
   Matrix& operator -=(const Matrix& other) {
-    // TODO Iteration
+    assert(DimensionMatches(other));
+    for (Index row = 0; row < Rows(); ++row) {
+      for (Index col = 0; col < Cols(); ++col) {
+        (*this)(row, col) -= other(row, col);
+      }
+    }
     return *this;
   }
 
@@ -47,17 +57,35 @@ public:
 
   Matrix operator-() const {
     auto ret = *this;
-    // TODO Iteration
+    for (Index row = 0; row < Rows(); ++row) {
+      for (Index col = 0; col < Cols(); ++col) {
+        ret(row, col) = -ret(row, col);
+      }
+    }
     return ret;
   }
 
   Matrix Transpose() const {
-    // TODO Iteration
+    Matrix ret(Cols(), Rows());
+    for (Index row = 0; row < Rows(); ++row) {
+      for (Index col = 0; col < Cols(); ++col) {
+        ret(col, row) = (*this)(row, col);
+      }
+    }
+    return ret;
   }
 
-  friend Matrix operator*(const Matrix& a, const Matrix& b) {
-    Matrix res(a.Rows(), b.Cols());
-    // TODO Iteration
+  friend Matrix operator*(const Matrix& lhs, const Matrix& rhs) {
+    assert(lhs.Cols() == rhs.Rows());
+    Matrix res(lhs.Rows(), lhs.Cols());
+    for (Index res_row = 0; res_row < lhs.Rows(); ++res_row) {
+      for (Index res_col = 0; res_col < rhs.Cols(); ++res_col) {
+        for (Index res_iter = 0; res_iter < lhs.Cols(); ++res_iter) {
+          res(res_col, res_row) += lhs(res_row, res_iter) * rhs(
+              res_iter, res_col);
+        }
+      }
+    }
     return res;
   }
 
@@ -67,8 +95,27 @@ public:
   }
 
   friend std::ostream& operator <<(std::ostream& out, const Matrix& matrix) {
-    // TODO Iteration
+    out << '{';
+    for (Index row = 0; row < Rows(); ++row) {
+      if (row != 0) {
+        out << ',' << '\n';
+      }
+      out << "{";
+      for (Index col = 0; col < Cols(); ++col) {
+        if (col != 0) {
+          out << ', ' << ' ';
+        }
+        out << storage_(row, col);
+      }
+      out << '}';
+    }
+    out << '}';
     return out;
+  }
+
+private:
+  bool DimensionMatches(const Matrix& other) {
+    return Rows() == other.Rows() && Cols() == other.Cols();
   }
 
 private:
