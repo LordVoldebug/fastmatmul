@@ -1,5 +1,6 @@
 #pragma once
 #include <ranges>
+#include <ostream>
 #include "matrix_storage.h"
 
 namespace linalg_lib {
@@ -25,26 +26,48 @@ public:
   }
 
   Matrix& operator+=(const Matrix& other) {
-    for (auto& [this_element, to_add_element] : std::views::zip(
-             storage_, other.storage_)) {
-      this_element += to_add_element;
-    }
+    // TODO Iteration
     return *this;
   }
 
-  Matrix& operator-=(const Matrix& other) {
-    for (auto& [this_element, to_add_element] : std::views::zip(
-             storage_, other.storage_)) {
-      this_element -= to_add_element;
-    }
+  friend Matrix operator+(Matrix lhs, const Matrix& rhs) {
+    lhs += rhs;
+    return lhs;
+  }
+
+  Matrix& operator -=(const Matrix& other) {
+    // TODO Iteration
     return *this;
+  }
+
+  friend Matrix operator-(Matrix lhs, const Matrix& rhs) {
+    lhs -= rhs;
+    return lhs;
+  }
+
+  Matrix operator-() const {
+    auto ret = *this;
+    // TODO Iteration
+    return ret;
+  }
+
+  friend Matrix operator*(const Matrix& a, const Matrix& b) {
+    Matrix res(a.Rows(), b.Cols());
+    // TODO Iteration
+    return res;
+  }
+
+  Matrix& operator*=(const Matrix& other) {
+    *this = std::move((*this) * other);
+    return *this;
+  }
+
+  friend std::ostream& operator <<(std::ostream& out, const Matrix& matrix) {
+    // TODO Iteration
+    return out;
   }
 
 private:
   detail::MatrixStorage<MatrixElement> storage_;
 };
-
-template<typename MatrixElement>
-Matrix<MatrixElement> operator+(const Matrix<MatrixElement>& lhs, const Matrix<MatrixElement>)
-
 } // namespace linalg_lib

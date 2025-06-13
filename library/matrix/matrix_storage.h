@@ -10,26 +10,25 @@ public:
   using Index = int64_t;
   using Size = int64_t;
 
-  MatrixStorage(Size rows, Size cols) : rows_(rows), cols_(cols),
-                                        data_(rows * cols) {
+  MatrixStorage(Size rows, Size cols) : cols_(cols), data_(rows * cols) {
     assert(rows >= 0);
     assert(cols >= 0);
   }
 
   auto&& operator()(this auto&& self, Index row, Index col) noexcept {
-    assert(0 <= row && row < rows_);
-    assert(0 <= col && col < cols_);
+    assert(0 <= row && row < Rows());
+    assert(0 <= col && col < Cols());
 
-    Index position = row * cols_ + col;
+    Index position = row * Cols() + col;
     return self.data_[position];
-  }
-
-  Size Rows() const noexcept {
-    return rows_;
   }
 
   Size Cols() const noexcept {
     return cols_;
+  }
+
+  Size Rows() const noexcept {
+    return std::ssize(data_) / Cols();
   }
 
   auto begin() noexcept { // NOLINT
@@ -41,7 +40,6 @@ public:
   }
 
 private:
-  Size rows_ = 0;
   Size cols_ = 0;
   std::vector<MatrixElement> data_;
 };
