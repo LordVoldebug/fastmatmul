@@ -3,7 +3,4 @@
 #include "utils/types.h"
 
 namespace linalg_lib {
-
-
-
-}  // namespace linalg_lib
+} // namespace linalg_lib
