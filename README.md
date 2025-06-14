@@ -1,9 +1,14 @@
 # linalg_lib
 
-Coursework for the first-year Data Science Master’s program at HSE  
+Course work first year Data Science masters HSE, Kaurkin Vladimir
 
-**Author:** Vladimir Kaurkin
+Implementation of various algorithms for Numerical Linear Algebra (...)
 
-Code (and up-to-date README) can be found in the dev branch:  
+To run tests:
 
-https://github.com/LordVoldebug/linalg_lib/tree/dev
+```shell
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake --build .
+ctest --output-on-failure
+```
