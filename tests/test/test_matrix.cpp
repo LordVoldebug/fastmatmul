@@ -31,6 +31,43 @@ TEST(MatrixDeathTests, MatrixAssignment) {
   EXPECT_DEATH({ A(3, 3) = 2; }, "");
 }
 
+TEST(MatrixCopy, ConstructorAssignmentAndValueSemantics) {
+  {
+    linalg_lib::Matrix<int> A = {{1, 2}, {3, 4}};
+    linalg_lib::Matrix<int> B(A);
+    EXPECT_TRUE(B == A);
+  }
+  {
+    linalg_lib::Matrix<int> A = {{5, 6}, {7, 8}};
+    linalg_lib::Matrix<int> B;
+    B = A;
+    EXPECT_TRUE(B == A);
+  }
+  {
+    linalg_lib::Matrix<int> A = {{9, 10}, {11, 12}};
+    linalg_lib::Matrix<int> B(A);
+    B(0, 0) = 42;
+    EXPECT_EQ(A(0, 0), 9);
+    EXPECT_EQ(B(0, 0), 42);
+  }
+}
+
+TEST(MatrixMove, ConstructorAndAssignment) {
+  {
+    linalg_lib::Matrix<int> A = {{1, 0}, {0, 1}};
+    auto original = A;
+    linalg_lib::Matrix<int> B(std::move(A));
+    EXPECT_TRUE(B == original);
+  }
+  {
+    linalg_lib::Matrix<int> A = {{2, 3}, {4, 5}};
+    auto original = A;
+    linalg_lib::Matrix<int> B;
+    B = std::move(A);
+    EXPECT_TRUE(B == original);
+  }
+}
+
 TEST(MatrixInitList, BasicConstruction) {
   linalg_lib::Matrix<int> A = {
       {1, 2, 3},
