@@ -35,6 +35,7 @@ public:
         storage_(row, col) = data.begin()[row].begin()[col];
       }
     }
+    // тут не через MatrixRange чтобы assert корректно вставить
   }
 
 
@@ -52,10 +53,8 @@ public:
 
   Matrix& operator+=(const Matrix& rhs) {
     assert(DimensionMatches(rhs));
-    for (Index row = 0; row < Rows(); ++row) {
-      for (Index col = 0; col < Cols(); ++col) {
-        (*this)(row, col) += rhs(row, col);
-      }
+    for (auto [row, col] : MatrixRange()) {
+      (*this)(row, col) += rhs(row, col);
     }
     return *this;
   }
@@ -72,10 +71,8 @@ public:
 
   Matrix& operator -=(const Matrix& rhs) {
     assert(DimensionMatches(rhs));
-    for (Index row = 0; row < Rows(); ++row) {
-      for (Index col = 0; col < Cols(); ++col) {
-        (*this)(row, col) -= rhs(row, col);
-      }
+    for (auto [row, col] : MatrixRange()) {
+      (*this)(row, col) -= rhs(row, col);
     }
     return *this;
   }
@@ -88,20 +85,16 @@ public:
 
   Matrix operator-() const {
     auto ret = *this;
-    for (Index row = 0; row < Rows(); ++row) {
-      for (Index col = 0; col < Cols(); ++col) {
-        ret(row, col) = -ret(row, col);
-      }
+    for (auto [row, col] : MatrixRange()) {
+      ret(row, col) = -ret(row, col);
     }
     return ret;
   }
 
   Matrix Transpose() const {
     Matrix ret(Cols(), Rows());
-    for (Index row = 0; row < Rows(); ++row) {
-      for (Index col = 0; col < Cols(); ++col) {
-        ret(col, row) = (*this)(row, col);
-      }
+    for (auto [row, col] : MatrixRange()) {
+      ret(col, row) = (*this)(row, col);
     }
     return ret;
   }
@@ -129,11 +122,9 @@ public:
     if (!DimensionMatches(rhs)) {
       return false;
     }
-    for (Index row = 0; row < Rows(); ++row) {
-      for (Index col = 0; col < Cols(); ++col) {
-        if (!detail::IsCloseToZero((*this)(row, col) - rhs(row, col))) {
-          return false;
-        }
+    for (auto [row, col] : MatrixRange()) {
+      if (!detail::IsCloseToZero((*this)(row, col) - rhs(row, col))) {
+        return false;
       }
     }
     return true;
@@ -156,7 +147,13 @@ public:
       out << '}';
     }
     out << '}';
+    // тут не через MatrixRange чтобы корректно c пустыми матрицами работать
+    // и вообще так логика чище тут получается
     return out;
+  }
+
+  auto MatrixRange() const {
+    return storage_.MatrixRange();
   }
 
 private:
@@ -174,7 +171,10 @@ private:
   // нам бы пригодилось бы знание о том, как внутри устроен storage
   // с другой стороны, например, storage лучше знает о том, как он внутри устроен
   // и например предоставляет итератор который позволяет в хорошем порядке матрицу обходить
+  // и предоставляет именно сам порядок, а не какие-то обертки по применению функций
   // и это не испортится, если мы там под ногами у нас поменяем хранение
+  // (это будет локальное изменние именно в логике хранения)
   // между column-major на row-major
+  // Но то что большинство методов я просто форваржу мне конечно не очень нравится...
 };
 } // namespace linalg_lib
