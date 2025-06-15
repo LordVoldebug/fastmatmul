@@ -11,7 +11,7 @@ bool IsSquareAndDiagonal(const Matrix<MatrixElement>& matrix) {
 
 template <typename MatrixElement>
 bool IsOrthogonal(const Matrix<MatrixElement>& matrix) {
-  return IsSquareAndDiagonal(matrix * matrix.Transpose());
+  return IsSquareAndDiagonal(matrix * Transposed(matrix));
 }
 
 template <typename MatrixElement>

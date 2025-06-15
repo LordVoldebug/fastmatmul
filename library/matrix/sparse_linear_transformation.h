@@ -49,7 +49,7 @@ public:
   friend UnderlyingMatrixType<Matrix> operator*(const Matrix& lhs,
                                                 const SparseLinearTransformation
                                                 & rhs) {
-    assert(lhs.Cols() == rhs.Rows());
+    assert(DimensionMultiplicationMatches(lhs, rhs));
     UnderlyingMatrixType<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [rhs_row, rhs_col, rhs_val] : rhs.elements_) {
       for (Index lhs_row = 0; lhs_row < lhs.Rows(); ++lhs_row) {
@@ -62,7 +62,7 @@ public:
   template <MatrixOrViewType Matrix>
   friend UnderlyingMatrixType<Matrix> operator*(
       const SparseLinearTransformation& lhs, const Matrix& rhs) {
-    assert(lhs.Cols() == rhs.Rows());
+    assert(DimensionMultiplicationMatches(lhs, rhs));
     UnderlyingMatrixType<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [lhs_row, lhs_col, lhs_val] : lhs.elements_) {
       for (Index rhs_col = 0; rhs_col < rhs.Cols(); ++rhs_col) {

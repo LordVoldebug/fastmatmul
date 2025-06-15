@@ -12,25 +12,23 @@ template <typename>
 struct IsMatrix : std::false_type {
 };
 
-template <typename T>
-struct IsMatrix<Matrix<T>> : std::true_type {
+template <typename M>
+struct IsMatrix<Matrix<M>> : std::true_type {
 };
 
 template <typename M>
 concept MatrixType = IsMatrix<std::remove_cvref_t<M>>::value;
 
-template <MatrixType MatrixType>
+template <MatrixType Matrix>
 class MatrixView;
 
 template <typename>
 struct IsMatrixView : std::false_type {
 };
 
-template <MatrixType T>
-struct IsMatrixView<MatrixView<T>> : std::true_type {
+template <MatrixType M>
+struct IsMatrixView<MatrixView<M>> : std::true_type {
 };
-
-
 
 template <typename M>
 concept MatrixViewType = IsMatrixView<std::remove_cvref_t<M>>::value;
@@ -39,7 +37,25 @@ template <typename M>
 concept MatrixOrViewType = MatrixType<M> || MatrixViewType<M>;
 
 template <class M>
-using UnderlyingMatrixType = Matrix<typename std::remove_cvref_t<M>::MatrixElementType>;
+struct ElementTypeImpl;
+
+template <class T>
+struct ElementTypeImpl<Matrix<T>> {
+  using Type = T;
+};
+
+template <class B>
+struct ElementTypeImpl<MatrixView<B>> {
+  using Type =
+  typename ElementTypeImpl<std::remove_cvref_t<B>>::Type;
+};
+
+template <class M>
+using MatrixElementType = typename ElementTypeImpl<std::remove_cvref_t<M>>::Type
+;
+
+template <typename M>
+using UnderlyingMatrixType = Matrix<MatrixElementType<M>>;
 
 template <typename Matrix>
 struct QRResult {

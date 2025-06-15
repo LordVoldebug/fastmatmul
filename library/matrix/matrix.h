@@ -1,15 +1,32 @@
 #pragma once
 #include <ranges>
 #include <ostream>
+#include <functional>
 #include "matrix_storage.h"
 #include "utils/arithmetics.h"
 #include "utils/types.h"
+#include <iostream>
 
 namespace linalg_lib {
 template <MatrixOrViewType Matrix>
 bool DimensionMatches(const Matrix& lhs, const Matrix& rhs) {
   return lhs.Rows() == rhs.Rows() && lhs.Cols() == rhs.Cols();
 }
+
+// Тут просто typename, потому что она же для SparseLinearTransformation
+// а полноценно их в общую логику выделить ну можно но только сюда что ли?...
+// тем более SparseLinearTransformation достаточно сервисный объект, у него нет
+// полноценной семантики разреженной матрицы...
+template <typename Matrix>
+bool DimensionMultiplicationMatches(const Matrix& lhs, const Matrix& rhs) {
+  return lhs.Cols() == rhs.Rows();
+}
+
+template <typename Matrix>
+bool IsSquare(const Matrix& matrix) {
+  return matrix.Cols() == matrix.Rows();
+}
+
 
 template <typename MatrixElement>
 class Matrix {
@@ -26,7 +43,7 @@ public:
   explicit Matrix(Size rows) : storage_(rows, rows) {
   }
 
-  template<MatrixViewType ViewType>
+  template <MatrixViewType ViewType>
   explicit Matrix(ViewType view) : Matrix(
       view.Rows(), view.Cols()) {
     for (auto [row, col] : MatrixRange()) {
@@ -230,6 +247,14 @@ UnderlyingMatrixType<MatrixType> MatrixCopy(MatrixType&& matrix) {
   return UnderlyingMatrixType<MatrixType>(std::forward<MatrixType>(matrix));
 }
 
+template <MatrixOrViewType Matrix>
+void Apply(Matrix& matrix,
+           const std::function<void(MatrixElementType<Matrix>&)>& operation) {
+  for (auto [row, col] : matrix.MatrixRange()) {
+    operation(matrix(row, col));
+  }
+}
+
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix& operator+=(LMatrix& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
@@ -301,8 +326,9 @@ std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-UnderlyingMatrixType<LMatrix>  operator*(const LMatrix& lhs, const RMatrix& rhs) {
-  assert(lhs.Cols() == rhs.Rows());
+UnderlyingMatrixType<LMatrix> operator
+*(const LMatrix& lhs, const RMatrix& rhs) {
+  assert(DimensionMultiplicationMatches(lhs, rhs));
   UnderlyingMatrixType<LMatrix> res(lhs.Rows(), rhs.Cols());
   Size iter_size = lhs.Cols();
   for (auto [res_row, res_col] : res.MatrixRange()) {
@@ -316,30 +342,57 @@ UnderlyingMatrixType<LMatrix>  operator*(const LMatrix& lhs, const RMatrix& rhs)
 
 template <MatrixType LMatrix, MatrixOrViewType RMatrix>
 LMatrix& operator*=(LMatrix& lhs, const RMatrix& rhs) {
+  assert(DimensionMultiplicationMatches(lhs, rhs));
   lhs = lhs * rhs;
   return lhs;
 }
 
 template <MatrixViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix& operator*=(LMatrix& lhs, const RMatrix& rhs) {
+  assert(DimensionMultiplicationMatches(lhs, rhs));
+  assert(IsSquare(lhs));
+  assert(IsSquare(rhs));
   lhs.Store(lhs * rhs);
   return lhs;
 }
 
 template <MatrixOrViewType Matrix>
-Matrix operator-(const Matrix& matrix) {
-  auto ret = MatrixCopy(matrix);
-  for (auto [row, col] : ret.MatrixRange()) {
-    ret(row, col) = -ret(row, col);
-  }
-  return ret;
-}
-template <MatrixOrViewType Matrix>
-UnderlyingMatrixType<Matrix> Transposed(const Matrix& matrix)  {
+UnderlyingMatrixType<Matrix> Transposed(const Matrix& matrix) {
   UnderlyingMatrixType<Matrix> ret(matrix.Cols(), matrix.Rows());
   for (auto [row, col] : matrix.MatrixRange()) {
     ret(col, row) = matrix(row, col);
   }
+  return ret;
+}
+
+template <MatrixOrViewType Matrix>
+Matrix& operator*=(Matrix& matrix, MatrixElementType<Matrix> k) {
+  Apply(matrix, [k](auto& v) {
+    v *= k;
+  });
+  return matrix;
+}
+
+template <MatrixOrViewType Matrix>
+UnderlyingMatrixType<Matrix> operator*(const Matrix& matrix,
+                                       MatrixElementType<Matrix> k) {
+  auto res = MatrixCopy(matrix);
+  res *= k;
+  return res;
+}
+
+template <MatrixOrViewType Matrix>
+UnderlyingMatrixType<Matrix> operator*(MatrixElementType<Matrix> k,
+                                       const Matrix& matrix) {
+  return matrix * k;
+}
+
+template <MatrixOrViewType Matrix>
+Matrix operator-(const Matrix& matrix) {
+  auto ret = MatrixCopy(matrix);
+  Apply(ret, [](auto& v) {
+    v = -v;
+  });
   return ret;
 }
 } // namespace linalg_lib
