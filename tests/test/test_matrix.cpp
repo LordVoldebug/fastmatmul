@@ -144,8 +144,8 @@ TEST(MatrixDefaultValues, ZeroInit) {
 
 TEST(MatrixInitList, Unit) {
   linalg_lib::Matrix I = linalg_lib::Matrix<int>::Unit(3);
-  linalg_lib::Matrix<int> reference = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-  EXPECT_EQ(I, reference);
+  linalg_lib::Matrix<int> expected = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+  EXPECT_EQ(I, expected);
 }
 
 TEST(MatrixOps, AddAssign) {

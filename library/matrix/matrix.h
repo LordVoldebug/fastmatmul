@@ -8,8 +8,8 @@
 #include <iostream>
 
 namespace linalg_lib {
-template <MatrixOrViewType Matrix>
-bool DimensionMatches(const Matrix& lhs, const Matrix& rhs) {
+template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
+bool DimensionMatches(const LMatrix& lhs, const RMatrix& rhs) {
   return lhs.Rows() == rhs.Rows() && lhs.Cols() == rhs.Cols();
 }
 
@@ -17,8 +17,8 @@ bool DimensionMatches(const Matrix& lhs, const Matrix& rhs) {
 // а полноценно их в общую логику выделить ну можно но только сюда что ли?...
 // тем более SparseLinearTransformation достаточно сервисный объект, у него нет
 // полноценной семантики разреженной матрицы...
-template <typename Matrix>
-bool DimensionMultiplicationMatches(const Matrix& lhs, const Matrix& rhs) {
+template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
+bool DimensionMultiplicationMatches(const LMatrix& lhs, const RMatrix& rhs) {
   return lhs.Cols() == rhs.Rows();
 }
 
@@ -33,7 +33,6 @@ class Matrix {
 public:
   using StorageType = detail::MatrixStorage<MatrixElement>;
   using MatrixRangeType = typename StorageType::MatrixRangeType;
-  using MatrixElementType = MatrixElement;
 
   Matrix() = default;
 
@@ -77,12 +76,23 @@ public:
     return storage_.Cols();
   }
 
-  auto View(this auto&& self);
-  auto SubMatrix(this auto&& self, Index row, Index col);
-  auto SubMatrix(this auto&& self, Index row, Index col, Size row_count,
-                      Size col_count);
-  auto Row(this auto&& self, Index row);
-  auto Col(this auto&& self, Index col);
+  auto View(this auto&& self) {
+    return MatrixView(self, Index{0}, Index{0}, self.Rows(), self.Cols());
+  }
+
+  auto SubMatrix(this auto&& self, Index start_row, Index start_col) {
+    return self.View().SubMatrix(start_row, start_col);
+  }
+  auto SubMatrix(this auto&& self, Index start_row, Index start_col, Size row_count,
+                      Size col_count) {
+    return self.View().SubMatrix(start_row, start_col, row_count, col_count);
+  }
+  auto Row(this auto&& self, Index row) {
+    return self.View().Row(row);
+  }
+  auto Col(this auto&& self, Index col) {
+    return self.View().Col(col);
+  }
 
 
   static Matrix Unit(Size rows) {
@@ -121,30 +131,36 @@ private:
 // Перегрузки через deducing this, поэтому кажется безопасно тут все
 // А также есть метод ConstView() который явно вернет константную вьюшку
 // Без идей, насколько хороший или плохой это дизайн
+
+// TODO может быть поддержать транспониированную вьюшку?
+// Но как нибудь потом...
 template <MatrixType BaseMatrix>
 class MatrixView {
   using BaseMatrixType = std::remove_reference_t<BaseMatrix>;
 
 public:
   using MatrixRangeType = typename BaseMatrixType::MatrixRangeType;
-  using MatrixElementType = typename BaseMatrixType::MatrixElementType;
+  using MatrixElement =  MatrixElementType<BaseMatrix>;
   using MatrixElementRefType = std::conditional_t<std::is_const_v<BaseMatrix>,
-                                                  const MatrixElementType&,
-                                                  MatrixElementType&>;
+                                                  const MatrixElement&,
+                                                  MatrixElement&>;
 
 private:
+  friend  Matrix<MatrixElement>;
+  template <MatrixType> friend class MatrixView;
+
   // хочу сделать этот конструктор деталью реализации, чтобы
   // со стороны всегда View создавалась через методы матрицы
   // сделать конструктор private и объявить freind показалось хорошей идеей тут...
 
-  MatrixView(BaseMatrix matrix, Size start_row, Size start_col, Size rows,
+  MatrixView(BaseMatrix& matrix, Size start_row, Size start_col, Size rows,
              Size cols)
     : matrix_(matrix),
       start_row_(start_row), start_col_(start_col),
       rows_(rows), cols_(cols) {
     assert(0 <= start_row_ && 0 <= start_col_);
-    assert(start_row_ + rows_ <= matrix_.Rows());
-    assert(start_col_ + cols_ <= matrix_.Cols());
+    assert(start_row_ + rows_ <= matrix_.get().Rows());
+    assert(start_col_ + cols_ <= matrix_.get().Cols());
     // На этом моменте начинаешь задумываться про Strong Type Aliassing....
   }
 
@@ -154,6 +170,33 @@ public:
     assert(0 <= col && col < self.Cols());
 
     return self.matrix_.get()(row + self.start_row_, col + self.start_col_);
+  }
+
+  auto View(this auto&& self) {
+    return MatrixView(self.matrix_.get(), Index{0}, Index{0}, self.Rows(), self.Cols());
+  }
+
+  auto SubMatrix(this auto&& self, Index start_row, Index start_col) {
+    assert(0 <= start_row && start_row < self.Rows());
+    assert(0 <= start_col && start_col < self.Cols());
+    return MatrixView(self.matrix_.get(), self.start_row_ + start_row, self.start_col_ + start_col, self.Rows() - start_row, self.Cols() - start_col);
+  }
+
+  auto SubMatrix(this auto&& self, Index start_row, Index start_col,
+                                             Size rows, Size cols) {
+    assert(0 <= start_row && start_row + rows <= self.Rows());
+    assert(0 <= start_col && start_col + cols <= self.Cols());
+    return MatrixView(self.matrix_.get(), self.start_row_ + start_row, self.start_col_ + start_col, rows, cols);
+  }
+
+  auto Row(this auto&& self, Index row) {
+    assert(0 <= row && row < self.Rows());
+    return MatrixView(self.matrix_.get(), self.start_row_ + row, self.start_col_, Size{1}, self.Cols());
+  }
+
+  auto Col(this auto&& self, Index col) {
+    assert(0 <= col && col < self.Cols());
+    return MatrixView(self.matrix_.get(), self.start_row_, self.start_col_ + col, self.Rows(), Size{1});
   }
 
   template <MatrixOrViewType Matrix>
@@ -194,52 +237,11 @@ public:
   }
 
 private:
-  std::reference_wrapper<BaseMatrix> matrix_;
+  std::reference_wrapper<BaseMatrixType> matrix_;
   Size start_row_ = 0, start_col_ = 0;
   Size rows_ = 0, cols_ = 0;
 };
 
-template <typename M>
-MatrixView(M&) -> MatrixView<M>;
-template <typename M>
-MatrixView(const M&) -> MatrixView<const M>;
-
-// Эти методы полагаются на user-defined deduction Guide
-// поэтому их пришлось вынести
-// Мне кажется, что он тут уместен, да и с какой-то стороны логично что они
-// пишутся уже после того, как полностью объявлен MatrixView
-
-template <typename MatrixElement>
-auto Matrix<MatrixElement>::View(this auto&& self) {
-  return MatrixView(self, Index{0}, Index{0}, self.Rows(), self.Cols());
-}
-
-template <typename MatrixElement>
-auto Matrix<MatrixElement>::SubMatrix(this auto&& self, Index row, Index col) {
-  assert(0 <= row && row < self.Rows());
-  assert(0 <= col && col < self.Cols());
-  return MatrixView(self, row, col, self.Rows() - row, self.Cols() - col);
-}
-
-template <typename MatrixElement>
-auto Matrix<MatrixElement>::SubMatrix(this auto&& self, Index row, Index col,
-                                           Size rows, Size cols) {
-  assert(0 <= row && row + rows <= self.Rows());
-  assert(0 <= col && col + cols <= self.Cols());
-  return MatrixView(self, row, col, rows, cols);
-}
-
-template <typename MatrixElement>
-auto Matrix<MatrixElement>::Row(this auto&& self, Index row) {
-  assert(0 <= row && row < self.Rows());
-  return MatrixView(self, row, Index{0}, 1, self.Cols());
-}
-
-template <typename MatrixElement>
-auto Matrix<MatrixElement>::Col(this auto&& self, Index col) {
-  assert(0 <= col && col < self.Cols());
-  return MatrixView(self, Index{0}, col, self.Rows(), 1);
-}
 
 
 template <MatrixOrViewType MatrixType>
@@ -388,7 +390,7 @@ UnderlyingMatrixType<Matrix> operator*(MatrixElementType<Matrix> k,
 }
 
 template <MatrixOrViewType Matrix>
-Matrix operator-(const Matrix& matrix) {
+UnderlyingMatrixType<Matrix> operator-(const Matrix& matrix) {
   auto ret = MatrixCopy(matrix);
   Apply(ret, [](auto& v) {
     v = -v;
