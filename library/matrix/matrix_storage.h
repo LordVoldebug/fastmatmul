@@ -62,7 +62,9 @@ private:
   Size rows_, cols_;
 };
 
-// Эта логика принадлежит storage, решил в отдельный файл не выносить
+// Логика MatrixEntryIterator принадлежит storage, решил в отдельный файл не выносить
+// может стоит вообще внутрь MatrixStorage внести?
+
 
 template <typename MatrixElement>
 class MatrixStorage {

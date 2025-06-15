@@ -49,46 +49,6 @@ public:
     return storage_.Cols();
   }
 
-  Matrix& operator+=(const Matrix& rhs) {
-    assert(DimensionMatches(rhs));
-    for (auto [row, col] : MatrixRange()) {
-      (*this)(row, col) += rhs(row, col);
-    }
-    return *this;
-  }
-
-  friend Matrix operator+(Matrix lhs, const Matrix& rhs) {
-    assert(lhs.DimensionMatches(rhs));
-    // Думал о том, стоит ли тут ставить assert, или сказать что
-    // это ответственность +=. Решил, что пусть будет и здесь
-    // логически ассерты наверное не то, что стоит экономить и разделять сферы
-    // ответсвенности, но если не прав, то подскажи
-    lhs += rhs;
-    return lhs;
-  }
-
-  Matrix& operator -=(const Matrix& rhs) {
-    assert(DimensionMatches(rhs));
-    for (auto [row, col] : MatrixRange()) {
-      (*this)(row, col) -= rhs(row, col);
-    }
-    return *this;
-  }
-
-  friend Matrix operator-(Matrix lhs, const Matrix& rhs) {
-    assert(lhs.DimensionMatches(rhs));
-    lhs -= rhs;
-    return lhs;
-  }
-
-  Matrix operator-() const {
-    auto ret = *this;
-    for (auto [row, col] : MatrixRange()) {
-      ret(row, col) = -ret(row, col);
-    }
-    return ret;
-  }
-
   Matrix Transpose() const {
     Matrix ret(Cols(), Rows());
     for (auto [row, col] : MatrixRange()) {
@@ -97,68 +57,11 @@ public:
     return ret;
   }
 
-  friend Matrix operator*(const Matrix& lhs, const Matrix& rhs) {
-    assert(lhs.Cols() == rhs.Rows());
-    Matrix res(lhs.Rows(), rhs.Cols());
-    for (Index res_row = 0; res_row < lhs.Rows(); ++res_row) {
-      for (Index res_col = 0; res_col < rhs.Cols(); ++res_col) {
-        for (Index res_iter = 0; res_iter < lhs.Cols(); ++res_iter) {
-          res(res_row, res_col) += lhs(res_row, res_iter) * rhs(
-              res_iter, res_col);
-        }
-      }
-    }
-    return res;
-  }
-
-  Matrix& operator*=(const Matrix& rhs) {
-    *this = std::move((*this) * rhs);
-    return *this;
-  }
-
-  bool operator==(const Matrix& rhs) const {
-    if (!DimensionMatches(rhs)) {
-      return false;
-    }
-    for (auto [row, col] : MatrixRange()) {
-      if (!detail::IsCloseToZero((*this)(row, col) - rhs(row, col))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  friend std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
-    out << '{';
-    for (Index row = 0; row < matrix.Rows(); ++row) {
-      if (row != 0) {
-        out << ',' << '\n' << ' '; // сомневался, не лучше ли выводить строку
-        // но логически показалось что лучше по символам (в выводе +- за разное отвечают)
-      }
-      out << "{";
-      for (Index col = 0; col < matrix.Cols(); ++col) {
-        if (col != 0) {
-          out << ',' << ' ';
-        }
-        out << matrix(row, col);
-      }
-      out << '}';
-    }
-    out << '}';
-    // тут не через MatrixRange чтобы корректно c пустыми матрицами работать
-    // и вообще так логика чище тут получается
-    return out;
-  }
-
   auto MatrixRange() const {
     return storage_.MatrixRange();
   }
 
 private:
-  bool DimensionMatches(const Matrix& rhs) const {
-    return Rows() == rhs.Rows() && Cols() == rhs.Cols();
-  }
-
   detail::MatrixStorage<MatrixElement> storage_;
   // Возможно лишняя абстракция, у меня нет сильного мнения
   // Логически хотелось сказать, что матрица это расширение двумерного массива
@@ -174,4 +77,118 @@ private:
   // между column-major на row-major
   // Но то что большинство методов я просто форваржу мне не очень нравится...
 };
+
+template <typename>
+struct IsMatrixTrait : std::false_type {
+};
+
+template <typename T>
+struct IsMatrixTrait<Matrix<T>> : std::true_type {
+};
+
+template <typename M>
+concept MatrixType = IsMatrixTrait<M>::value;
+
+
+template <MatrixType Matrix>
+bool DimensionMatches(const Matrix& lhs, const Matrix& rhs) {
+  return lhs.Rows() == rhs.Rows() && lhs.Cols() == rhs.Cols();
+}
+
+template <MatrixType Matrix>
+Matrix& operator+=(Matrix& lhs, const Matrix& rhs) {
+  assert(DimensionMatches(lhs, rhs));
+  for (auto [row, col] : lhs.MatrixRange()) {
+    lhs(row, col) += rhs(row, col);
+  }
+  return lhs;
+}
+
+template <MatrixType Matrix>
+Matrix operator+(Matrix lhs, const Matrix& rhs) {
+  assert(DimensionMatches(lhs, rhs));
+  lhs += rhs;
+  return lhs;
+}
+
+template <MatrixType Matrix>
+Matrix& operator-=(Matrix& lhs, const Matrix& rhs) {
+  assert(DimensionMatches(lhs, rhs));
+  for (auto [row, col] : lhs.MatrixRange()) {
+    lhs(row, col) -= rhs(row, col);
+  }
+  return lhs;
+}
+
+template <MatrixType Matrix>
+Matrix operator-(Matrix lhs, const Matrix& rhs) {
+  assert(DimensionMatches(lhs, rhs));
+  lhs -= rhs;
+  return lhs;
+}
+
+template <MatrixType Matrix>
+bool operator==(const Matrix& lhs, const Matrix& rhs) {
+  if (!DimensionMatches(lhs, rhs)) {
+    return false;
+  }
+  for (auto [row, col] : lhs.MatrixRange()) {
+    if (!detail::IsCloseToZero(lhs(row, col) - rhs(row, col))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template <MatrixType Matrix>
+std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
+  out << '{';
+  for (Index row = 0; row < matrix.Rows(); ++row) {
+    if (row != 0) {
+      out << ',' << '\n' << ' '; // сомневался, не лучше ли выводить строку
+      // но логически показалось что лучше по символам (в выводе +- за разное отвечают)
+    }
+    out << "{";
+    for (Index col = 0; col < matrix.Cols(); ++col) {
+      if (col != 0) {
+        out << ',' << ' ';
+      }
+      out << matrix(row, col);
+    }
+    out << '}';
+  }
+  out << '}';
+  // тут не через MatrixRange чтобы корректно c пустыми матрицами работать
+  // и вообще так логика чище тут получается
+  return out;
+}
+
+template <MatrixType Matrix>
+Matrix operator*(const Matrix& lhs, const Matrix& rhs) {
+  assert(lhs.Cols() == rhs.Rows());
+  Matrix res(lhs.Rows(), rhs.Cols());
+  Size iter_size = lhs.Cols();
+  for (auto [res_row, res_col] : res.MatrixRange()) {
+    for (Index res_iter = 0; res_iter < iter_size; ++res_iter) {
+      res(res_row, res_col) += lhs(res_row, res_iter) * rhs(
+          res_iter, res_col);
+    }
+  }
+  return res;
+}
+
+template <MatrixType Matrix>
+Matrix& operator*=(Matrix& lhs, const Matrix& rhs) {
+  lhs = lhs * rhs;
+  return lhs;
+}
+
+template <MatrixType Matrix>
+Matrix operator-(const Matrix& A) {
+  auto ret = A;
+  for (auto [row, col] : ret.MatrixRange()) {
+    ret(row, col) = -ret(row, col);
+  }
+  return ret;
+}
 } // namespace linalg_lib
