@@ -3,14 +3,12 @@
 #include <ostream>
 #include "matrix_storage.h"
 #include "utils/arithmetics.h"
+#include "utils/types.h"
 
 namespace linalg_lib {
 template <typename MatrixElement>
 class Matrix {
 public:
-  using Index = typename detail::MatrixStorage<MatrixElement>::Index;
-  using Size = typename detail::MatrixStorage<MatrixElement>::Size;
-
   Matrix() = default;
 
   Matrix(Size rows, Size cols) : storage_(rows, cols) {
@@ -161,7 +159,6 @@ private:
     return Rows() == rhs.Rows() && Cols() == rhs.Cols();
   }
 
-private:
   detail::MatrixStorage<MatrixElement> storage_;
   // Возможно лишняя абстракция, у меня нет сильного мнения
   // Логически хотелось сказать, что матрица это расширение двумерного массива
