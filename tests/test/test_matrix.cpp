@@ -55,13 +55,13 @@ TEST(MatrixCopy, ConstructorAssignmentAndValueSemantics) {
 TEST(MatrixMove, ConstructorAndAssignment) {
   {
     linalg_lib::Matrix<int> A = {{1, 0}, {0, 1}};
-    auto original = A;
+    linalg_lib::Matrix original = A;
     linalg_lib::Matrix<int> B(std::move(A));
     EXPECT_TRUE(B == original);
   }
   {
     linalg_lib::Matrix<int> A = {{2, 3}, {4, 5}};
-    auto original = A;
+    linalg_lib::Matrix original = A;
     linalg_lib::Matrix<int> B;
     B = std::move(A);
     EXPECT_TRUE(B == original);
@@ -143,7 +143,7 @@ TEST(MatrixDefaultValues, ZeroInit) {
 }
 
 TEST(MatrixInitList, Unit) {
-  auto I = linalg_lib::Matrix<int>::Unit(3);
+  linalg_lib::Matrix I = linalg_lib::Matrix<int>::Unit(3);
   linalg_lib::Matrix<int> reference = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
   EXPECT_EQ(I, reference);
 }
@@ -167,13 +167,13 @@ TEST(MatrixOps, AddAssign) {
 
 TEST(MatrixOps, Add) {
   {
-    auto C = linalg_lib::Matrix<int>{{1, 2}, {3, 4}}
+    linalg_lib::Matrix C = linalg_lib::Matrix<int>{{1, 2}, {3, 4}}
              + linalg_lib::Matrix<int>{{5, 6}, {7, 8}};
     linalg_lib::Matrix<int> expected = {{6, 8}, {10, 12}};
     EXPECT_TRUE(C == expected);
   }
   {
-    auto C = linalg_lib::Matrix<int>{{1, 2, 3}, {4, 5, 6}}
+    linalg_lib::Matrix C = linalg_lib::Matrix<int>{{1, 2, 3}, {4, 5, 6}}
              + linalg_lib::Matrix<int>{{6, 5, 4}, {3, 2, 1}};
     linalg_lib::Matrix<int> expected = {{7, 7, 7}, {7, 7, 7}};
     EXPECT_TRUE(C == expected);
@@ -184,7 +184,7 @@ TEST(MatrixDeathTests, AddMismatch) {
   linalg_lib::Matrix<int> A = {{1, 2}, {3, 4}};
   linalg_lib::Matrix<int> B = {{1, 2, 3}, {4, 5, 6}};
   EXPECT_DEATH({ A += B; }, "");
-  EXPECT_DEATH({ auto C = A + B; }, "");
+  EXPECT_DEATH({ linalg_lib::Matrix C = A + B; }, "");
 }
 
 TEST(MatrixOps, SubAssign) {
@@ -206,13 +206,13 @@ TEST(MatrixOps, SubAssign) {
 
 TEST(MatrixOps, Sub) {
   {
-    auto C = linalg_lib::Matrix<int>{{5, 7}, {9, 11}}
+    linalg_lib::Matrix C = linalg_lib::Matrix<int>{{5, 7}, {9, 11}}
              - linalg_lib::Matrix<int>{{1, 2}, {3, 4}};
     linalg_lib::Matrix<int> expected = {{4, 5}, {6, 7}};
     EXPECT_TRUE(C == expected);
   }
   {
-    auto C = linalg_lib::Matrix<int>{{10, 10, 10}, {20, 20, 20}}
+    linalg_lib::Matrix C = linalg_lib::Matrix<int>{{10, 10, 10}, {20, 20, 20}}
              - linalg_lib::Matrix<int>{{1, 2, 3}, {4, 5, 6}};
     linalg_lib::Matrix<int> expected = {{9, 8, 7}, {16, 15, 14}};
     EXPECT_TRUE(C == expected);
@@ -223,7 +223,7 @@ TEST(MatrixDeathTests, SubMismatch) {
   linalg_lib::Matrix<int> A = {{1, 2}, {3, 4}};
   linalg_lib::Matrix<int> B = {{1}, {2}};
   EXPECT_DEATH({ A -= B; }, "");
-  EXPECT_DEATH({ auto C = A - B; }, "");
+  EXPECT_DEATH({ linalg_lib::Matrix C = A - B; }, "");
 }
 
 TEST(MatrixOps, MulAssign) {
@@ -258,7 +258,7 @@ TEST(MatrixOps, Mul) {
   {
     linalg_lib::Matrix<int> A = {{1, 2}, {3, 4}};
     linalg_lib::Matrix<int> B = {{5, 6}, {7, 8}};
-    auto C = A * B;
+    linalg_lib::Matrix C = A * B;
     linalg_lib::Matrix<int> expected1 = {{19, 22}, {43, 50}};
     EXPECT_TRUE(C == expected1);
   }
@@ -266,12 +266,12 @@ TEST(MatrixOps, Mul) {
     linalg_lib::Matrix<int> A = {{1, 2, 3}};
     linalg_lib::Matrix<int> B = {{4}, {5}, {6}};
     {
-      auto C = A * B;
+      linalg_lib::Matrix C = A * B;
       linalg_lib::Matrix<int> expected = {{32}};
       EXPECT_TRUE(C == expected);
     }
     {
-      auto C = B * A;
+      linalg_lib::Matrix C = B * A;
       linalg_lib::Matrix<int> expected = {
           {4, 8, 12},
           {5, 10, 15},
@@ -287,26 +287,26 @@ TEST(MatrixDeathTests, MulMismatch) {
     linalg_lib::Matrix<int> A = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     linalg_lib::Matrix<int> B = {{1, 2}, {3, 4}};
     EXPECT_DEATH({ A *= B; }, "");
-    EXPECT_DEATH({ auto C = A * B; }, "");
+    EXPECT_DEATH({ linalg_lib::Matrix C = A * B; }, "");
   }
   {
     linalg_lib::Matrix<int> X = {{1, 2, 3}, {4, 5, 6}};
     linalg_lib::Matrix<int> Y = {{7, 8, 9}, {10, 11, 12}};
     EXPECT_DEATH({ X *= Y; }, "");
-    EXPECT_DEATH({ auto D = X * Y; }, "");
+    EXPECT_DEATH({ linalg_lib::Matrix D = X * Y; }, "");
   }
 }
 
 TEST(MatrixOps, UnaryMinus) {
-  auto A = linalg_lib::Matrix<int>{{1, -2}, {3, -4}};
-  auto B = -A;
+  linalg_lib::Matrix A = linalg_lib::Matrix<int>{{1, -2}, {3, -4}};
+  linalg_lib::Matrix B = -A;
   linalg_lib::Matrix<int> expected = {{-1, 2}, {-3, 4}};
   EXPECT_TRUE(B == expected);
 }
 
 TEST(MatrixOps, Transpose) {
-  auto A = linalg_lib::Matrix<int>{{1, 2, 3}, {4, 5, 6}};
-  auto B = A.Transpose();
+  linalg_lib::Matrix A = linalg_lib::Matrix<int>{{1, 2, 3}, {4, 5, 6}};
+  linalg_lib::Matrix B = A.Transposed();
   linalg_lib::Matrix<int> expected = {{1, 4}, {2, 5}, {3, 6}};
   EXPECT_TRUE(B == expected);
 }

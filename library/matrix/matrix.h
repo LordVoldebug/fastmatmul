@@ -37,8 +37,9 @@ public:
         storage_(row, col) = data.begin()[row].begin()[col];
       }
     }
-    // тут не через MatrixRange чтобы assert корректно вставить
+    // тут не через MatrixRange чтобы assert аккуратно вставить
   }
+
 
 
   decltype(auto) operator()(this auto&& self, Index row, Index col) {
@@ -56,7 +57,7 @@ public:
     return storage_.Cols();
   }
 
-  Matrix Transpose() const {
+  Matrix Transposed () const {
     Matrix ret(Cols(), Rows());
     for (auto [row, col] : MatrixRange()) {
       ret(col, row) = (*this)(row, col);
@@ -85,13 +86,15 @@ private:
   // Но то что большинство методов я просто форваржу мне не очень нравится...
 };
 
+
+
 template <typename MatrixType>
 class MatrixView {
-  using Base = std::remove_reference_t<MatrixType>;
+  using BaseMatrixType = std::remove_reference_t<MatrixType>;
 
 public:
-  using MatrixRangeType = typename Base::MatrixRangeType;
-  using MatrixElementType = typename Base::MatrixElementType;
+  using MatrixRangeType = typename BaseMatrixType::MatrixRangeType;
+  using MatrixElementType = typename BaseMatrixType::MatrixElementType;
   using MatrixElementRefType = std::conditional_t<std::is_const_v<MatrixType>,
                                                   const MatrixElementType&,
                                                   MatrixElementType&>;
@@ -102,8 +105,8 @@ public:
       start_row_(start_row), start_col_(start_col),
       rows_(rows), cols_(cols) {
     assert(0 <= start_row_ && 0 <= start_col_);
-    assert(start_row_ + rows < matrix_.Rows());
-    assert(start_col + cols_ < matrix_.Cols());
+    assert(start_row_ + rows_ <= matrix_.Rows());
+    assert(start_col_ + cols_ <= matrix_.Cols());
     // На этом моменте начинаешь задумываться про Strong Type Aliassing....
   }
 
@@ -131,17 +134,6 @@ private:
   Size start_row_ = 0, start_col_ = 0;
   Size rows_ = 0, cols_ = 0;
 };
-
-template <typename>
-struct IsMatrixTrait : std::false_type {
-};
-
-template <typename T>
-struct IsMatrixTrait<Matrix<T>> : std::true_type {
-};
-
-template <typename M>
-concept MatrixType = IsMatrixTrait<M>::value;
 
 
 template <MatrixType Matrix>
