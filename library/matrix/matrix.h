@@ -11,6 +11,7 @@ class Matrix {
 public:
   using StorageType = detail::MatrixStorage<MatrixElement>;
   using MatrixRangeType = typename StorageType::MatrixRangeType;
+  using MatrixElementType = MatrixElement;
 
   Matrix() = default;
 
@@ -40,7 +41,7 @@ public:
   }
 
 
-  auto&& operator()(this auto&& self, Index row, Index col) {
+  decltype(auto) operator()(this auto&& self, Index row, Index col) {
     assert(0 <= row && row < self.Rows());
     assert(0 <= col && col < self.Cols());
 
@@ -84,17 +85,41 @@ private:
   // Но то что большинство методов я просто форваржу мне не очень нравится...
 };
 
-template <typename MatrixElement>
+template <typename MatrixType>
 class MatrixView {
-public:
-  using MatrixType = Matrix<MatrixElement>;
-  using MatrixRangeType = typename MatrixType::MatrixRangeType;
+  using Base = std::remove_reference_t<MatrixType>;
 
-  auto&& operator()(this auto&& self, Index row, Index col) {
+public:
+  using MatrixRangeType = typename Base::MatrixRangeType;
+  using MatrixElementType = typename Base::MatrixElementType;
+  using MatrixElementRefType = std::conditional_t<std::is_const_v<MatrixType>,
+                                                  const MatrixElementType&,
+                                                  MatrixElementType&>;
+
+  MatrixView(MatrixType matrix, Size start_row, Size start_col, Size rows,
+             Size cols)
+    : matrix_(matrix),
+      start_row_(start_row), start_col_(start_col),
+      rows_(rows), cols_(cols) {
+    assert(0 <= start_row_ && 0 <= start_col_);
+    assert(start_row_ + rows < matrix_.Rows());
+    assert(start_col + cols_ < matrix_.Cols());
+    // На этом моменте начинаешь задумываться про Strong Type Aliassing....
+  }
+
+  decltype(auto) operator()(this auto&& self, Index row, Index col) {
     assert(0 <= row && row < self.Rows());
     assert(0 <= col && col < self.Cols());
 
-    return self.matrix_(row + self.start_row_, col + self.start_col_);
+    return self.matrix_.get()(row + self.start_row_, col + self.start_col_);
+  }
+
+  Size Rows() const {
+    return rows_;
+  }
+
+  Size Cols() const {
+    return cols_;
   }
 
   MatrixRangeType MatrixRange() const {
@@ -103,8 +128,8 @@ public:
 
 private:
   std::reference_wrapper<MatrixType> matrix_;
-  Size rows_ = 0, cols_ = 0;
   Size start_row_ = 0, start_col_ = 0;
+  Size rows_ = 0, cols_ = 0;
 };
 
 template <typename>
