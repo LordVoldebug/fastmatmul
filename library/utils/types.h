@@ -1,7 +1,7 @@
 #pragma once
+#include <type_traits>
 
 namespace linalg_lib {
-
 using Index = int64_t;
 using Size = int64_t;
 
@@ -9,40 +9,48 @@ template <typename MatrixType>
 class Matrix;
 
 template <typename>
-struct IsMatrixTrait : std::false_type {};
+struct IsMatrix : std::false_type {
+};
 
 template <typename T>
-struct IsMatrixTrait<Matrix<T>> : std::true_type {};
+struct IsMatrix<Matrix<T>> : std::true_type {
+};
 
 template <typename M>
-concept MatrixType = IsMatrixTrait<M>::value;
+concept MatrixType = IsMatrix<std::remove_cvref_t<M>>::value;
 
-template <typename MatrixType>
+template <MatrixType MatrixType>
 class MatrixView;
 
 template <typename>
-struct IsMatrixViewTrait : std::false_type {};
+struct IsMatrixView : std::false_type {
+};
 
-template <typename T>
-struct IsMatrixViewTrait<MatrixView<T>> : std::true_type {};
+template <MatrixType T>
+struct IsMatrixView<MatrixView<T>> : std::true_type {
+};
+
+
 
 template <typename M>
-concept MatrixViewType = IsMatrixTrait<M>::value;
+concept MatrixViewType = IsMatrixView<std::remove_cvref_t<M>>::value;
 
-template<typename T>
-concept MatrixOrViewType = MatrixType<T> || MatrixViewType<T>;
+template <typename M>
+concept MatrixOrViewType = MatrixType<M> || MatrixViewType<M>;
 
-template<typename Matrix>
+template <class M>
+using UnderlyingMatrixType = Matrix<typename std::remove_cvref_t<M>::MatrixElementType>;
+
+template <typename Matrix>
 struct QRResult {
   Matrix Q;
   Matrix R;
 };
 
-template<typename Matrix>
+template <typename Matrix>
 struct SVDResult {
   Matrix U;
   Matrix Sigma;
   Matrix V;
 };
-
-}  // namespace linalg_lib
+} // namespace linalg_lib

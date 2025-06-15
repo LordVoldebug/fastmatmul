@@ -306,7 +306,7 @@ TEST(MatrixOps, UnaryMinus) {
 
 TEST(MatrixOps, Transpose) {
   linalg_lib::Matrix A = linalg_lib::Matrix<int>{{1, 2, 3}, {4, 5, 6}};
-  linalg_lib::Matrix B = A.Transposed();
+  linalg_lib::Matrix B = Transposed(A);
   linalg_lib::Matrix<int> expected = {{1, 4}, {2, 5}, {3, 6}};
   EXPECT_TRUE(B == expected);
 }

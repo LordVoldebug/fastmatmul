@@ -32,13 +32,27 @@ class SparseLinearTransformation {
   // Или строить заранее? но скорее не хочется логически в детали лезть, что это именно
   // как список хранится
 
-  Matrix<MatrixElement> ApplyLeft(Matrix<MatrixElement> matrix) {
+  Size Rows() const {
+    return rows_;
+  }
+
+  Size Cols() const {
+    return cols_;
+  }
+
+  template <MatrixOrViewType Matrix>
+  friend Matrix operator*(const Matrix& lhs, const SparseLinearTransformation& rhs) {
+    assert(lhs.Cols() == rhs.Rows());
+    Matrix res(lhs.Rows(), rhs.Cols());
+  }
+
+  template <MatrixOrViewType Matrix>
+  friend Matrix operator*(const SparseLinearTransformation& lhs, const Matrix& rhs) {
+    assert(lhs.Cols() == rhs.Rows());
+    Matrix res(lhs.Rows(), rhs.Cols());
 
   }
 
-  Matrix<MatrixElement> ApplyRight(Matrix<MatrixElement> matrix) {
-
-  }
 
 private:
   std::vector<LinearTransformationEntryType> elements_;
