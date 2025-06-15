@@ -9,6 +9,9 @@ namespace linalg_lib {
 template <typename MatrixElement>
 class Matrix {
 public:
+  using StorageType = detail::MatrixStorage<MatrixElement>;
+  using MatrixRangeType = typename StorageType::MatrixRangeType;
+
   Matrix() = default;
 
   Matrix(Size rows, Size cols) : storage_(rows, cols) {
@@ -38,6 +41,9 @@ public:
 
 
   auto&& operator()(this auto&& self, Index row, Index col) {
+    assert(0 <= row && row < self.Rows());
+    assert(0 <= col && col < self.Cols());
+
     return self.storage_(row, col);
   }
 
@@ -57,12 +63,12 @@ public:
     return ret;
   }
 
-  auto MatrixRange() const {
+  MatrixRangeType MatrixRange() const {
     return storage_.MatrixRange();
   }
 
 private:
-  detail::MatrixStorage<MatrixElement> storage_;
+  StorageType storage_;
   // Возможно лишняя абстракция, у меня нет сильного мнения
   // Логически хотелось сказать, что матрица это расширение двумерного массива
   // а уже то, как он внутри там устроен (чтобы лучше в кэши укладываться и т. п)
@@ -76,6 +82,29 @@ private:
   // (это будет локальное изменние именно в логике хранения)
   // между column-major на row-major
   // Но то что большинство методов я просто форваржу мне не очень нравится...
+};
+
+template <typename MatrixElement>
+class MatrixView {
+public:
+  using MatrixType = Matrix<MatrixElement>;
+  using MatrixRangeType = typename MatrixType::MatrixRangeType;
+
+  auto&& operator()(this auto&& self, Index row, Index col) {
+    assert(0 <= row && row < self.Rows());
+    assert(0 <= col && col < self.Cols());
+
+    return self.matrix_(row + self.start_row_, col + self.start_col_);
+  }
+
+  MatrixRangeType MatrixRange() const {
+    return MatrixRange(rows_, cols_);
+  }
+
+private:
+  std::reference_wrapper<MatrixType> matrix_;
+  Size rows_ = 0, cols_ = 0;
+  Size start_row_ = 0, start_col_ = 0;
 };
 
 template <typename>
