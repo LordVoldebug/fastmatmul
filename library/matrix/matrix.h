@@ -22,7 +22,7 @@ bool DimensionMultiplicationMatches(const LMatrix& lhs, const RMatrix& rhs) {
   return lhs.Cols() == rhs.Rows();
 }
 
-template <typename Matrix>
+template <MatrixOrViewType Matrix>
 bool IsSquare(const Matrix& matrix) {
   return matrix.Cols() == matrix.Rows();
 }
