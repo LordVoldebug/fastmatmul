@@ -83,13 +83,17 @@ public:
   auto SubMatrix(this auto&& self, Index start_row, Index start_col) {
     return self.View().SubMatrix(start_row, start_col);
   }
-  auto SubMatrix(this auto&& self, Index start_row, Index start_col, Size row_count,
+
+  auto SubMatrix(this auto&& self, Index start_row, Index start_col,
+                      Size row_count,
                       Size col_count) {
     return self.View().SubMatrix(start_row, start_col, row_count, col_count);
   }
+
   auto Row(this auto&& self, Index row) {
     return self.View().Row(row);
   }
+
   auto Col(this auto&& self, Index col) {
     return self.View().Col(col);
   }
@@ -140,14 +144,15 @@ class MatrixView {
 
 public:
   using MatrixRangeType = typename BaseMatrixType::MatrixRangeType;
-  using MatrixElement =  MatrixElementType<BaseMatrix>;
+  using MatrixElement = MatrixElementType<BaseMatrix>;
   using MatrixElementRefType = std::conditional_t<std::is_const_v<BaseMatrix>,
                                                   const MatrixElement&,
                                                   MatrixElement&>;
 
 private:
-  friend  Matrix<MatrixElement>;
-  template <MatrixType> friend class MatrixView;
+  friend Matrix<MatrixElement>;
+  template <MatrixType>
+  friend class MatrixView;
 
   // хочу сделать этот конструктор деталью реализации, чтобы
   // со стороны всегда View создавалась через методы матрицы
@@ -173,30 +178,36 @@ public:
   }
 
   auto View(this auto&& self) {
-    return MatrixView(self.matrix_.get(), Index{0}, Index{0}, self.Rows(), self.Cols());
+    return MatrixView(self.matrix_.get(), Index{0}, Index{0}, self.Rows(),
+                      self.Cols());
   }
 
   auto SubMatrix(this auto&& self, Index start_row, Index start_col) {
     assert(0 <= start_row && start_row < self.Rows());
     assert(0 <= start_col && start_col < self.Cols());
-    return MatrixView(self.matrix_.get(), self.start_row_ + start_row, self.start_col_ + start_col, self.Rows() - start_row, self.Cols() - start_col);
+    return MatrixView(self.matrix_.get(), self.start_row_ + start_row,
+                      self.start_col_ + start_col, self.Rows() - start_row,
+                      self.Cols() - start_col);
   }
 
   auto SubMatrix(this auto&& self, Index start_row, Index start_col,
-                                             Size rows, Size cols) {
+                      Size rows, Size cols) {
     assert(0 <= start_row && start_row + rows <= self.Rows());
     assert(0 <= start_col && start_col + cols <= self.Cols());
-    return MatrixView(self.matrix_.get(), self.start_row_ + start_row, self.start_col_ + start_col, rows, cols);
+    return MatrixView(self.matrix_.get(), self.start_row_ + start_row,
+                      self.start_col_ + start_col, rows, cols);
   }
 
   auto Row(this auto&& self, Index row) {
     assert(0 <= row && row < self.Rows());
-    return MatrixView(self.matrix_.get(), self.start_row_ + row, self.start_col_, Size{1}, self.Cols());
+    return MatrixView(self.matrix_.get(), self.start_row_ + row,
+                      self.start_col_, Size{1}, self.Cols());
   }
 
   auto Col(this auto&& self, Index col) {
     assert(0 <= col && col < self.Cols());
-    return MatrixView(self.matrix_.get(), self.start_row_, self.start_col_ + col, self.Rows(), Size{1});
+    return MatrixView(self.matrix_.get(), self.start_row_,
+                      self.start_col_ + col, self.Rows(), Size{1});
   }
 
   template <MatrixOrViewType Matrix>
@@ -242,13 +253,6 @@ private:
   Size rows_ = 0, cols_ = 0;
 };
 
-
-
-template <MatrixOrViewType MatrixType>
-UnderlyingMatrixType<MatrixType> MatrixCopy(MatrixType&& matrix) {
-  return UnderlyingMatrixType<MatrixType>(std::forward<MatrixType>(matrix));
-}
-
 template <MatrixOrViewType Matrix>
 void Apply(Matrix&& matrix,
            const std::function<void(MatrixElementType<Matrix>&)>& operation) {
@@ -269,7 +273,7 @@ LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 UnderlyingMatrixType<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
-  auto res = MatrixCopy(std::forward<LMatrix>(lhs));
+  UnderlyingMatrixType<LMatrix> res(std::forward<LMatrix>(lhs));
   res += rhs;
   return res;
 }
@@ -286,7 +290,7 @@ LMatrix&& operator-=(LMatrix&& lhs, const RMatrix& rhs) {
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 UnderlyingMatrixType<LMatrix> operator-(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
-  auto res = MatrixCopy(std::forward<LMatrix>(lhs));
+  UnderlyingMatrixType<LMatrix> res(std::forward<LMatrix>(lhs));
   res -= rhs;
   return res;
 }
@@ -378,7 +382,7 @@ Matrix&& operator*=(Matrix&& matrix, MatrixElementType<Matrix> k) {
 template <MatrixOrViewType Matrix>
 UnderlyingMatrixType<Matrix> operator*(const Matrix& matrix,
                                        MatrixElementType<Matrix> k) {
-  auto res = MatrixCopy(matrix);
+  UnderlyingMatrixType<Matrix> res(matrix);
   res *= k;
   return res;
 }
@@ -391,10 +395,10 @@ UnderlyingMatrixType<Matrix> operator*(MatrixElementType<Matrix> k,
 
 template <MatrixOrViewType Matrix>
 UnderlyingMatrixType<Matrix> operator-(const Matrix& matrix) {
-  auto ret = MatrixCopy(matrix);
-  Apply(ret, [](auto& v) {
+  UnderlyingMatrixType<Matrix> res(matrix);
+  Apply(res, [](auto& v) {
     v = -v;
   });
-  return ret;
+  return res;
 }
 } // namespace linalg_lib
