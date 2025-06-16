@@ -2,6 +2,7 @@
 #include "matrix/matrix.h"
 #include "utils/arithmetics.h"
 #include "utils/types.h"
+#include "matrix/sparse_linear_transformation.h"
 
 namespace linalg_lib::detail {
 
@@ -19,17 +20,23 @@ Matrix<MatrixElement> Givens2DRotation(MatrixElement a1, MatrixElement a2) {
 }
 
 template <typename MatrixElement>
-Matrix<MatrixElement> GivensRotation(Size rows, Index pos0, Index pos1, MatrixElement a1, MatrixElement a2) {
+SparseLinearTransformation<MatrixElement> GivensRotation(Size rows, Index pos0, Index pos1, MatrixElement a1, MatrixElement a2) {
   using Matrix = Matrix<MatrixElement>;
-  Matrix transformatrion = Matrix::Unit(rows);
   Matrix rotation = Givens2DRotation(a1, a2);
 
-  transformatrion(pos0, pos0) = rotation(0, 0);
-  transformatrion(pos0, pos1) = rotation(0, 1);
-  transformatrion(pos1, pos0) = rotation(1, 0);
-  transformatrion(pos1, pos1) = rotation(1, 1);
+  SparseLinearTransformation<MatrixElement> transformation(rows, rows);
+  for (Index row = 0; row < rows; ++row) {
+    if (row != pos0 && row != pos1) {
+      transformation.AddEntry(row, row, MatrixElement{1});
+    }
+  }
 
-  return transformatrion;
+  transformation.AddEntry(pos0, pos0, rotation(0, 0));
+  transformation.AddEntry(pos0, pos1, rotation(0, 1));
+  transformation.AddEntry(pos1, pos0, rotation(1, 0));
+  transformation.AddEntry(pos1, pos1, rotation(1, 1));
+
+  return transformation;
 }
 
 } // namespace linalg_lib::detail
