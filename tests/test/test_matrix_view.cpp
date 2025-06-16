@@ -11,7 +11,10 @@ TEST(MatrixViewConstruction, BasicAndNested) {
     EXPECT_TRUE(V == A);
   }
   {
-    linalg_lib::Matrix<int> A = {{1, 2, 3}, {4, 5, 6}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
 
     auto sub = A.SubMatrix(0, 1, 2, 2);
     linalg_lib::Matrix<int> expected_sub = {{2, 3}, {5, 6}};
@@ -66,27 +69,33 @@ TEST(MatrixViewBoundsDeath, OperatorAndGetter) {
   {
     linalg_lib::Matrix<int> A(2, 3);
     auto V = A.View();
-    EXPECT_DEATH({ (void)V(2,0); }, "");
-    EXPECT_DEATH({ (void)V(0,3); }, "");
+    EXPECT_DEATH({ V(2,0); }, "");
+    EXPECT_DEATH({ V(0,3); }, "");
   }
   {
     linalg_lib::Matrix<int> A(2, 3);
-    EXPECT_DEATH({ (void)A.SubMatrix(1,1,2,3); }, "");
-    EXPECT_DEATH({ (void)A.Row(2); }, "");
-    EXPECT_DEATH({ (void)A.Col(3); }, "");
+    EXPECT_DEATH({ A.SubMatrix(1,1,2,3); }, "");
+    EXPECT_DEATH({ A.Row(2); }, "");
+    EXPECT_DEATH({ A.Col(3); }, "");
   }
 }
 
 TEST(MatrixViewValueSemantics, CopyAndMoveShareBacking) {
   {
-    linalg_lib::Matrix<int> A = {{1, 2}, {3, 4}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2},
+        {3, 4}
+    };
     auto V1 = A.View();
     auto V2 = V1;
     V2(0, 0) = 10;
     EXPECT_EQ(A(0,0), 10);
   }
   {
-    linalg_lib::Matrix<int> A = {{5, 6}, {7, 8}};
+    linalg_lib::Matrix<int> A = {
+        {5, 6},
+        {7, 8}
+    };
     auto V1 = A.View();
     auto V2 = std::move(V1);
     V2(1, 1) = 42;
@@ -98,17 +107,29 @@ TEST(MatrixViewStoreAndInplace, StoreAddSubScalarMulAndMismatch) {
   {
     linalg_lib::Matrix<int> A(2, 2);
     auto V = A.View();
-    linalg_lib::Matrix<int> src = {{1, 2}, {3, 4}};
+    linalg_lib::Matrix<int> src = {
+        {1, 2},
+        {3, 4}
+    };
     V.Store(src);
     EXPECT_TRUE(A == src);
-    linalg_lib::Matrix<int> B = {{5, 6}, {7, 8}};
+    linalg_lib::Matrix<int> B = {
+        {5, 6},
+        {7, 8}
+    };
     V += B;
-    linalg_lib::Matrix<int> expected = {{6, 8}, {10, 12}};
+    linalg_lib::Matrix<int> expected = {
+        {6, 8},
+        {10, 12}
+    };
     EXPECT_TRUE(A == expected);
     V -= B;
     EXPECT_TRUE(A == src);
     V *= 3;
-    linalg_lib::Matrix<int> scaled = {{3, 6}, {9, 12}};
+    linalg_lib::Matrix<int> scaled = {
+        {3, 6},
+        {9, 12}
+    };
     EXPECT_TRUE(A == scaled);
   }
   {
@@ -118,8 +139,14 @@ TEST(MatrixViewStoreAndInplace, StoreAddSubScalarMulAndMismatch) {
     EXPECT_DEATH({ V.Store(bad); }, "");
   }
   {
-    linalg_lib::Matrix<int> A = {{1, 2}, {3, 4}};
-    linalg_lib::Matrix<int> B = {{5, 6}, {7, 8}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2},
+        {3, 4}
+    };
+    linalg_lib::Matrix<int> B = {
+        {5, 6},
+        {7, 8}
+    };
     auto VA = A.View();
     VA *= B;
     linalg_lib::Matrix<int> expected = {{19, 22}, {43, 50}};
@@ -180,10 +207,16 @@ TEST(MatrixViewNonMutatingMatrixOps, AddSubMulUnary) {
     }
   }
   {
-    linalg_lib::Matrix<int> A = {{1, -2}, {-3, 4}};
+    linalg_lib::Matrix<int> A = {
+        {1, -2},
+        {-3, 4}
+    };
     auto V = A.View();
     auto N = -V;
-    linalg_lib::Matrix<int> expected = {{-1, 2}, {3, -4}};
+    linalg_lib::Matrix<int> expected = {
+        {-1, 2},
+        {3, -4}
+    };
     EXPECT_TRUE(N == expected);
     EXPECT_TRUE((A == linalg_lib::Matrix<int>{{1,-2},{-3,4}}));
   }
@@ -191,7 +224,10 @@ TEST(MatrixViewNonMutatingMatrixOps, AddSubMulUnary) {
 
 TEST(MatrixViewScalarOps, NonMutatingAndMutating) {
   {
-    linalg_lib::Matrix<int> A = {{1, 2}, {3, 4}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2},
+        {3, 4}
+    };
     auto sub = A.SubMatrix(0, 0, 2, 1);
     auto B = sub * 4;
     auto C = 4 * sub;
@@ -207,10 +243,16 @@ TEST(MatrixViewScalarOps, NonMutatingAndMutating) {
     EXPECT_TRUE(A == expected);
   }
   {
-    linalg_lib::Matrix<int> A = {{2, 4}, {6, 8}};
+    linalg_lib::Matrix<int> A = {
+        {2, 4},
+        {6, 8}
+    };
     auto V = A.View();
     V *= -2;
-    linalg_lib::Matrix<int> expected = {{-4, -8}, {-12, -16}};
+    linalg_lib::Matrix<int> expected = {
+        {-4, -8},
+        {-12, -16}
+    };
     EXPECT_TRUE(A == expected);
   }
 }
@@ -244,15 +286,28 @@ TEST(MatrixViewGettersArithmetic, DeepNestedMath) {
 
 TEST(MatrixViewTranspose, FullSubEmpty) {
   {
-    linalg_lib::Matrix<int> A = {{1, 2, 3}, {4, 5, 6}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
     auto T = linalg_lib::Transposed(A.View());
-    linalg_lib::Matrix<int> expected = {{1, 4}, {2, 5}, {3, 6}};
+    linalg_lib::Matrix<int> expected = {
+        {1, 4},
+        {2, 5},
+        {3, 6}
+    };
     EXPECT_TRUE(T == expected);
   }
   {
-    linalg_lib::Matrix<int> A = {{1, 2, 3}, {4, 5, 6}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
     auto T = Transposed(A.SubMatrix(0, 1, 2, 2));
-    linalg_lib::Matrix<int> expected = {{2, 5}, {3, 6}};
+    linalg_lib::Matrix<int> expected = {
+        {2, 5},
+        {3, 6}
+    };
     EXPECT_TRUE(T == expected);
   }
   {
@@ -330,13 +385,19 @@ TEST(MatrixViewMultiplicationInplace, SquareSubmatrixAndNonSquareDeath) {
 
 TEST(MatrixViewStreamOutput, FullAndSub) {
   {
-    linalg_lib::Matrix<int> A = {{1, 2, 3}, {4, 5, 6}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
     std::ostringstream oss;
     oss << A.View();
     EXPECT_EQ(oss.str(), "{{1, 2, 3},\n {4, 5, 6}}");
   }
   {
-    linalg_lib::Matrix<int> A = {{1, 2, 3}, {4, 5, 6}};
+    linalg_lib::Matrix<int> A = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
     auto sub = A.SubMatrix(0, 1, 2, 2);
     std::ostringstream oss;
     oss << sub;

@@ -16,8 +16,8 @@ bool DimensionMatches(const LMatrix& lhs, const RMatrix& rhs) {
 // Тут просто typename, потому что она же для SparseLinearTransformation
 // а полноценно их в общую логику выделить ну можно но только сюда что ли?...
 // тем более SparseLinearTransformation достаточно сервисный объект, у него нет
-// полноценной семантики разреженной матрицы...
-template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
+// полноценной семантики разреженной матрицы... даже если и стоит, то короче потом
+template <typename LMatrix, typename RMatrix>
 bool DimensionMultiplicationMatches(const LMatrix& lhs, const RMatrix& rhs) {
   return lhs.Cols() == rhs.Rows();
 }
