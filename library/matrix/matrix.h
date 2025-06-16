@@ -250,7 +250,7 @@ UnderlyingMatrixType<MatrixType> MatrixCopy(MatrixType&& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-void Apply(Matrix& matrix,
+void Apply(Matrix&& matrix,
            const std::function<void(MatrixElementType<Matrix>&)>& operation) {
   for (auto [row, col] : matrix.MatrixRange()) {
     operation(matrix(row, col));
@@ -258,7 +258,7 @@ void Apply(Matrix& matrix,
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-LMatrix& operator+=(LMatrix& lhs, const RMatrix& rhs) {
+LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
   for (auto [row, col] : lhs.MatrixRange()) {
     lhs(row, col) += rhs(row, col);
@@ -275,7 +275,7 @@ UnderlyingMatrixType<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-LMatrix& operator-=(LMatrix& lhs, const RMatrix& rhs) {
+LMatrix&& operator-=(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
   for (auto [row, col] : lhs.MatrixRange()) {
     lhs(row, col) -= rhs(row, col);
@@ -343,14 +343,14 @@ UnderlyingMatrixType<LMatrix> operator
 }
 
 template <MatrixType LMatrix, MatrixOrViewType RMatrix>
-LMatrix& operator*=(LMatrix& lhs, const RMatrix& rhs) {
+LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMultiplicationMatches(lhs, rhs));
   lhs = lhs * rhs;
   return lhs;
 }
 
 template <MatrixViewType LMatrix, MatrixOrViewType RMatrix>
-LMatrix& operator*=(LMatrix& lhs, const RMatrix& rhs) {
+LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMultiplicationMatches(lhs, rhs));
   assert(IsSquare(lhs));
   assert(IsSquare(rhs));
@@ -368,7 +368,7 @@ UnderlyingMatrixType<Matrix> Transposed(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-Matrix& operator*=(Matrix& matrix, MatrixElementType<Matrix> k) {
+Matrix&& operator*=(Matrix&& matrix, MatrixElementType<Matrix> k) {
   Apply(matrix, [k](auto& v) {
     v *= k;
   });

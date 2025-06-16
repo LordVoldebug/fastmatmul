@@ -52,8 +52,7 @@ public:
     assert(DimensionMultiplicationMatches(lhs, rhs));
     UnderlyingMatrixType<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [rhs_row, rhs_col, rhs_val] : rhs.elements_) {
-      auto res_col_view = res.Col(rhs_col);
-      res_col_view += lhs.Col(rhs_row) * rhs_val;
+      res.Col(rhs_col) += lhs.Col(rhs_row) * rhs_val;
     }
     return res;
   }
@@ -64,8 +63,7 @@ public:
     assert(DimensionMultiplicationMatches(lhs, rhs));
     UnderlyingMatrixType<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [lhs_row, lhs_col, lhs_val] : lhs.elements_) {
-      auto res_row_view = res.Row(lhs_row);
-      res_row_view += rhs.Row(lhs_col) * lhs_val;
+      res.Row(lhs_row) += rhs.Row(lhs_col) * lhs_val;
     }
     return res;
   }
