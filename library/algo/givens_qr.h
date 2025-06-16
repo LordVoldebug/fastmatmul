@@ -13,10 +13,6 @@ QRResult<Matrix<MatrixElement>> GivensQR(const Matrix<MatrixElement>& matrix) {
     for (Index row = col + 1; row < r_converge.Rows(); ++row) {
       auto transformation = detail::GivensRotation(r_converge.Rows(), col, row, r_converge(col, col), r_converge(row, col));
       r_converge = transformation * r_converge;
-      /*
-      std::cout << row << ' ' << col << std::endl;
-      std::cout << "trans\n" << transformation << std::endl;
-      std::cout << "cur_r\n" << r_converge << std::endl;*/
       q_suffix = transformation * q_suffix;
     }
   }

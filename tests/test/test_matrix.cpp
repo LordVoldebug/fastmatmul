@@ -566,3 +566,42 @@ TEST(MatrixOps, ScalarMultiply) {
     EXPECT_TRUE(B == expected);
   }
 }
+
+TEST(MatrixOps, ScalarDivide) {
+  {
+    linalg_lib::Matrix<int> A = {
+      {10, 20},
+      {30, 40}
+    };
+    A /= 5;
+    linalg_lib::Matrix<int> expected = {
+      {2, 4},
+      {6, 8}
+    };
+    EXPECT_TRUE(A == expected);
+  }
+  {
+    linalg_lib::Matrix<int> A = {
+      {9,  6},
+      {3, -3}
+    };
+    linalg_lib::Matrix<int> B = A / 3;
+    linalg_lib::Matrix<int> expected = {
+      {3, 2},
+      {1, -1}
+    };
+    EXPECT_TRUE(B == expected);
+  }
+  {
+    linalg_lib::Matrix<int> A = {
+      {-8,  4, 12},
+      {16, -2, -6}
+    };
+    A /= -2;
+    linalg_lib::Matrix<int> expected = {
+      {4, -2, -6},
+      {-8, 1, 3}
+    };
+    EXPECT_TRUE(A == expected);
+  }
+}

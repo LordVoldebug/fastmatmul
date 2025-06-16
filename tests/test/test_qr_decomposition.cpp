@@ -17,7 +17,7 @@ TEST(GivensQRTest, Unit) {
   EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(R));
 }
 
-TEST(GivensQRTest, PRINT) {
+TEST(HouseholderQR, Unit) {
   linalg_lib::Matrix<double> A = {
     { 4.0,  1.0,  3.0,  2.0},
     { 2.0,  5.0,  2.0,  1.0},
@@ -25,8 +25,22 @@ TEST(GivensQRTest, PRINT) {
     { 1.0,  2.0,  0.0,  8.0}
   };
 
-  auto result = GivensQR(A);
+  auto [Q, R] = HouseholderQR(A);
+  EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(Q));
+  EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * R));
+  EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(R));
+}
+
+/*
+TEST(GivensQRTest, PRINT) {
+  linalg_lib::Matrix<double> A = {
+    { 4.0,  1.0},
+    { 2.0,  5.0}
+  };
+
+  auto result = HouseholderQR(A);
   std::cout << "Q:\n" << result.Q << "\n";
   std::cout << "R:\n" << result.R << "\n";
   std::cout << result.Q * result.R << std::endl;
 }
+*/

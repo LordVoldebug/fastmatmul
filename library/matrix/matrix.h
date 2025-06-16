@@ -413,6 +413,22 @@ OwnedMatrix<Matrix> operator*(const Matrix& matrix,
 }
 
 template <MatrixOrViewType Matrix>
+Matrix&& operator /=(Matrix&& matrix, MatrixElementType<Matrix> k) {
+  Apply(matrix, [k](auto& v) {
+    v /= k;
+  });
+  return matrix;
+}
+
+template <MatrixOrViewType Matrix>
+OwnedMatrix<Matrix> operator/(const Matrix& matrix,
+                              MatrixElementType<Matrix> k) {
+  OwnedMatrix<Matrix> res(matrix);
+  res /= k;
+  return res;
+}
+
+template <MatrixOrViewType Matrix>
 OwnedMatrix<Matrix> operator*(MatrixElementType<Matrix> k,
                               const Matrix& matrix) {
   return matrix * k;
