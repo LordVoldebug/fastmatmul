@@ -3,17 +3,16 @@
 #include "utils/arithmetics.h"
 #include <gtest/gtest.h>
 
-TEST(IsCloseToZero, NearZeroAndNonZero) {
+TEST(IsEpsilonEqual, NearEqualAndNotEqual) {
   {
-    EXPECT_TRUE(linalg_lib::detail::IsCloseToZero(0.0));
-    EXPECT_TRUE(linalg_lib::detail::IsCloseToZero(1e-10));
-    EXPECT_TRUE(linalg_lib::detail::IsCloseToZero(-1e-10));
+    EXPECT_TRUE(linalg_lib::IsEpsilonEqual(0.0, 0.0));
+    EXPECT_TRUE(linalg_lib::IsEpsilonEqual(1.0, 1.0 + 1e-10));
+    EXPECT_TRUE(linalg_lib::IsEpsilonEqual(-2.5, -2.5 - 1e-10));
   }
   {
-    EXPECT_FALSE(linalg_lib::detail::IsCloseToZero(1e-8));
-    EXPECT_FALSE(linalg_lib::detail::IsCloseToZero(-1e-8));
-    EXPECT_FALSE(linalg_lib::detail::IsCloseToZero(1.0));
-    EXPECT_FALSE(linalg_lib::detail::IsCloseToZero(-1.0));
+    EXPECT_FALSE(linalg_lib::IsEpsilonEqual(1.0, 1.1));
+    EXPECT_FALSE(linalg_lib::IsEpsilonEqual(1e-8, 0.0));
+    EXPECT_FALSE(linalg_lib::IsEpsilonEqual(-1e-8, 0.0));
   }
 }
 

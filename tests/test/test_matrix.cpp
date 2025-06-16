@@ -157,6 +157,39 @@ TEST(MatrixComparison, NotEqual) {
   EXPECT_FALSE(A != A);
 }
 
+TEST(MatrixEpsilonComparison, Equal) {
+  linalg_lib::Matrix<double> A = {
+    {1.0,  2.0},
+    {3.0,  4.0}
+  };
+  linalg_lib::Matrix<double> B = {
+    {1.0 + 1e-10, 2.0 - 1e-10},
+    {3.0 + 1e-10, 4.0 - 1e-10}
+  };
+  EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, A));
+  EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, B));
+  EXPECT_TRUE(linalg_lib::IsEpsilonEqual(B, A));
+}
+
+TEST(MatrixEpsilonComparison, NotEqual) {
+  linalg_lib::Matrix<double> A = {
+    {1.0,  2.0},
+    {3.0,  4.0}
+  };
+  linalg_lib::Matrix<double> C = {
+    {1.0,  2.0},
+    {3.0,  4.1}
+  };
+  linalg_lib::Matrix<double> D = {
+    {1.0, 2.0, 3.0},
+    {4.0, 5.0, 6.0}
+  };
+  EXPECT_FALSE(linalg_lib::IsEpsilonEqual(A, C));
+  EXPECT_FALSE(linalg_lib::IsEpsilonEqual(A, D));
+  EXPECT_TRUE (linalg_lib::IsEpsilonEqual(A, A));
+}
+
+
 TEST(MatrixAssignment, CopyAndAssign) {
   linalg_lib::Matrix<int> A = {
       {1, 2},

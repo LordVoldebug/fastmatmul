@@ -62,9 +62,7 @@ public:
   }
 
   decltype(auto) operator()(this auto&& self, Index row, Index col) {
-    assert(0 <= row && row < self.Rows());
-    assert(0 <= col && col < self.Cols());
-
+    assert(self.InMatrix(row, col));
     return self.storage_(row, col);
   }
 
@@ -98,7 +96,6 @@ public:
     return self.View().Col(col);
   }
 
-
   static Matrix Unit(Size rows) {
     Matrix res(rows);
     for (Index row = 0; row < rows; ++row) {
@@ -110,6 +107,10 @@ public:
 
   MatrixRangeType MatrixRange() const {
     return storage_.MatrixRange();
+  }
+
+  bool InMatrix(Index row, Index col) const {
+    return 0 <= row && row < Rows() && 0 <= col && col < Cols();
   }
 
 private:
@@ -140,11 +141,10 @@ private:
 // Но как нибудь потом...
 template <MatrixType BaseMatrix>
 class MatrixView {
-  using BaseMatrixType = std::remove_reference_t<BaseMatrix>;
-
 public:
-  using MatrixRangeType = typename BaseMatrixType::MatrixRangeType;
-  using MatrixElement = MatrixElementType<BaseMatrix>;
+  using RawMatrixType = std::remove_reference_t<BaseMatrix>;
+  using MatrixRangeType = typename RawMatrixType::MatrixRangeType;
+  using MatrixElement = MatrixElementType<RawMatrixType>;
   using MatrixElementRefType = std::conditional_t<std::is_const_v<BaseMatrix>,
                                                   const MatrixElement&,
                                                   MatrixElement&>;
@@ -163,10 +163,16 @@ private:
     : matrix_(matrix),
       start_row_(start_row), start_col_(start_col),
       rows_(rows), cols_(cols) {
-    assert(0 <= start_row_ && 0 <= start_col_);
-    assert(start_row_ + rows_ <= matrix_.get().Rows());
-    assert(start_col_ + cols_ <= matrix_.get().Cols());
     // На этом моменте начинаешь задумываться про Strong Type Aliassing....
+    // Но чот мне кажется будет неудобно очень...
+    assert(rows_ >= 0);
+    assert(cols_ >= 0);
+    assert(0 <= start_row_ && start_row_ <= matrix_.get().Rows());
+    assert(0 <= start_col_ && start_col_ <= matrix_.get().Cols());
+    assert(
+        0 <= start_row_ + rows_ && start_row_ + rows_ <= matrix_.get().Rows());
+    assert(
+        0 <= start_col_ + cols_ && start_col_ + cols_ <= matrix_.get().Cols());
   }
 
 public:
@@ -183,17 +189,23 @@ public:
   }
 
   auto SubMatrix(this auto&& self, Index start_row, Index start_col) {
-    assert(0 <= start_row && start_row < self.Rows());
-    assert(0 <= start_col && start_col < self.Cols());
-    return MatrixView(self.matrix_.get(), self.start_row_ + start_row,
-                      self.start_col_ + start_col, self.Rows() - start_row,
-                      self.Cols() - start_col);
+    assert(0 <= start_row && start_row <= self.Rows());
+    assert(0 <= start_col && start_col <= self.Cols());
+    return self.SubMatrix(start_row, start_col, self.Rows() - start_row,
+                          self.Cols() - start_col);
   }
 
   auto SubMatrix(this auto&& self, Index start_row, Index start_col,
                       Size rows, Size cols) {
-    assert(0 <= start_row && start_row + rows <= self.Rows());
-    assert(0 <= start_col && start_col + cols <= self.Cols());
+    assert(rows >= 0);
+    assert(cols >= 0);
+    assert(0 <= start_row && start_row <= self.Rows());
+    assert(0 <= start_col && start_col <= self.Cols());
+    assert(0 <= start_row + rows && start_row + rows <= self.Rows());
+    assert(0 <= start_col + cols && start_col + cols <= self.Cols());
+    // Мне не нравятся эти цепочки ассертов, но как их вынести сохранив
+    // читаемость я не придумал (условно, LiesWithin внешней функцией
+    // имхо менее читаемо (какой параметр есть кто?)
     return MatrixView(self.matrix_.get(), self.start_row_ + start_row,
                       self.start_col_ + start_col, rows, cols);
   }
@@ -239,8 +251,8 @@ public:
     return MatrixRangeType(rows_, cols_);
   }
 
-  MatrixView<const BaseMatrixType&> ConstView() const {
-    return MatrixView<const BaseMatrixType&>(
+  MatrixView<const RawMatrixType&> ConstView() const {
+    return MatrixView<const RawMatrixType&>(
         matrix_.get(),
         start_row_, start_col_,
         rows_, cols_
@@ -248,7 +260,7 @@ public:
   }
 
 private:
-  std::reference_wrapper<BaseMatrixType> matrix_;
+  std::reference_wrapper<RawMatrixType> matrix_;
   Size start_row_ = 0, start_col_ = 0;
   Size rows_ = 0, cols_ = 0;
 };
@@ -271,9 +283,9 @@ LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-UnderlyingMatrixType<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
+OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
-  UnderlyingMatrixType<LMatrix> res(std::forward<LMatrix>(lhs));
+  OwnedMatrix<LMatrix> res(std::forward<LMatrix>(lhs));
   res += rhs;
   return res;
 }
@@ -288,9 +300,9 @@ LMatrix&& operator-=(LMatrix&& lhs, const RMatrix& rhs) {
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-UnderlyingMatrixType<LMatrix> operator-(LMatrix&& lhs, const RMatrix& rhs) {
+OwnedMatrix<LMatrix> operator-(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
-  UnderlyingMatrixType<LMatrix> res(std::forward<LMatrix>(lhs));
+  OwnedMatrix<LMatrix> res(std::forward<LMatrix>(lhs));
   res -= rhs;
   return res;
 }
@@ -301,7 +313,20 @@ bool operator==(const LMatrix& lhs, const RMatrix& rhs) {
     return false;
   }
   for (auto [row, col] : lhs.MatrixRange()) {
-    if (!detail::IsCloseToZero(lhs(row, col) - rhs(row, col))) {
+    if (lhs(row, col) != rhs(row, col)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
+bool IsEpsilonEqual(const LMatrix& lhs, const RMatrix& rhs) {
+  if (!DimensionMatches(lhs, rhs)) {
+    return false;
+  }
+  for (auto [row, col] : lhs.MatrixRange()) {
+    if (!IsEpsilonEqual(lhs(row, col), rhs(row, col))) {
       return false;
     }
   }
@@ -332,10 +357,10 @@ std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-UnderlyingMatrixType<LMatrix> operator
+OwnedMatrix<LMatrix> operator
 *(const LMatrix& lhs, const RMatrix& rhs) {
   assert(DimensionMultiplicationMatches(lhs, rhs));
-  UnderlyingMatrixType<LMatrix> res(lhs.Rows(), rhs.Cols());
+  OwnedMatrix<LMatrix> res(lhs.Rows(), rhs.Cols());
   Size iter_size = lhs.Cols();
   for (auto [res_row, res_col] : res.MatrixRange()) {
     for (Index res_iter = 0; res_iter < iter_size; ++res_iter) {
@@ -363,8 +388,8 @@ LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
 }
 
 template <MatrixOrViewType Matrix>
-UnderlyingMatrixType<Matrix> Transposed(const Matrix& matrix) {
-  UnderlyingMatrixType<Matrix> ret(matrix.Cols(), matrix.Rows());
+OwnedMatrix<Matrix> Transposed(const Matrix& matrix) {
+  OwnedMatrix<Matrix> ret(matrix.Cols(), matrix.Rows());
   for (auto [row, col] : matrix.MatrixRange()) {
     ret(col, row) = matrix(row, col);
   }
@@ -380,22 +405,22 @@ Matrix&& operator*=(Matrix&& matrix, MatrixElementType<Matrix> k) {
 }
 
 template <MatrixOrViewType Matrix>
-UnderlyingMatrixType<Matrix> operator*(const Matrix& matrix,
-                                       MatrixElementType<Matrix> k) {
-  UnderlyingMatrixType<Matrix> res(matrix);
+OwnedMatrix<Matrix> operator*(const Matrix& matrix,
+                              MatrixElementType<Matrix> k) {
+  OwnedMatrix<Matrix> res(matrix);
   res *= k;
   return res;
 }
 
 template <MatrixOrViewType Matrix>
-UnderlyingMatrixType<Matrix> operator*(MatrixElementType<Matrix> k,
-                                       const Matrix& matrix) {
+OwnedMatrix<Matrix> operator*(MatrixElementType<Matrix> k,
+                              const Matrix& matrix) {
   return matrix * k;
 }
 
 template <MatrixOrViewType Matrix>
-UnderlyingMatrixType<Matrix> operator-(const Matrix& matrix) {
-  UnderlyingMatrixType<Matrix> res(matrix);
+OwnedMatrix<Matrix> operator-(const Matrix& matrix) {
+  OwnedMatrix<Matrix> res(matrix);
   Apply(res, [](auto& v) {
     v = -v;
   });

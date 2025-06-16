@@ -5,6 +5,9 @@ namespace linalg_lib {
 using Index = int64_t;
 using Size = int64_t;
 
+template<typename T>
+concept Numeric = std::integral<T> || std::floating_point<T>;
+
 template <typename MatrixType>
 class Matrix;
 
@@ -44,10 +47,10 @@ struct ElementTypeImpl<Matrix<T>> {
   using Type = T;
 };
 
-template <class B>
-struct ElementTypeImpl<MatrixView<B>> {
+template <class BaseMatrixType>
+struct ElementTypeImpl<MatrixView<BaseMatrixType>> {
   using Type =
-  typename ElementTypeImpl<std::remove_cvref_t<B>>::Type;
+  typename ElementTypeImpl<std::remove_cvref_t<BaseMatrixType>>::Type;
 };
 
 template <class M>
@@ -55,7 +58,7 @@ using MatrixElementType = typename ElementTypeImpl<std::remove_cvref_t<M>>::Type
 ;
 
 template <typename M>
-using UnderlyingMatrixType = Matrix<MatrixElementType<M>>;
+using OwnedMatrix = Matrix<MatrixElementType<M>>;
 
 template <typename Matrix>
 struct QRResult {

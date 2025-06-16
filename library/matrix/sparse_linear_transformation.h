@@ -16,8 +16,7 @@ struct LinearTransformationEntry {
 
 template <typename MatrixElement>
 class SparseLinearTransformation {
-  using LinearTransformationEntryType = LinearTransformationEntry<MatrixElement>
-  ;
+  using LinearTransformationEntry = LinearTransformationEntry<MatrixElement>;
 
 public:
   SparseLinearTransformation(Size rows, Size cols) : rows_(rows), cols_(cols) {
@@ -46,11 +45,11 @@ public:
   }
 
   template <MatrixOrViewType Matrix>
-  friend UnderlyingMatrixType<Matrix> operator*(const Matrix& lhs,
+  friend OwnedMatrix<Matrix> operator*(const Matrix& lhs,
                                                 const SparseLinearTransformation
                                                 & rhs) {
     assert(DimensionMultiplicationMatches(lhs, rhs));
-    UnderlyingMatrixType<Matrix> res(lhs.Rows(), rhs.Cols());
+    OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [rhs_row, rhs_col, rhs_val] : rhs.elements_) {
       res.Col(rhs_col) += lhs.Col(rhs_row) * rhs_val;
     }
@@ -58,10 +57,10 @@ public:
   }
 
   template <MatrixOrViewType Matrix>
-  friend UnderlyingMatrixType<Matrix> operator*(
+  friend OwnedMatrix<Matrix> operator*(
       const SparseLinearTransformation& lhs, const Matrix& rhs) {
     assert(DimensionMultiplicationMatches(lhs, rhs));
-    UnderlyingMatrixType<Matrix> res(lhs.Rows(), rhs.Cols());
+    OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [lhs_row, lhs_col, lhs_val] : lhs.elements_) {
       res.Row(lhs_row) += rhs.Row(lhs_col) * lhs_val;
     }
@@ -69,7 +68,7 @@ public:
   }
 
 private:
-  std::vector<LinearTransformationEntryType> elements_;
+  std::vector<LinearTransformationEntry> elements_;
   Size rows_;
   Size cols_;
 };

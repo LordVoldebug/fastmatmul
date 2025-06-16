@@ -6,7 +6,8 @@ namespace linalg_lib::detail {
 
 template <typename MatrixElement>
 bool IsSquareAndDiagonal(const Matrix<MatrixElement>& matrix) {
-  return matrix.Rows() == matrix.Cols() && matrix == Matrix<MatrixElement>::Unit(matrix.Rows());
+  using Matrix = Matrix<MatrixElement>;
+  return matrix.Rows() == matrix.Cols() && IsEpsilonEqual(matrix, Matrix::Unit(matrix.Rows()));
 }
 
 template <typename MatrixElement>
