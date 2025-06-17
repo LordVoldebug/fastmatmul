@@ -8,7 +8,7 @@ template <typename MatrixElement>
 QRResult<Matrix<MatrixElement>> HouseholderQR(
     const Matrix<MatrixElement>& matrix) {
   using Matrix = Matrix<MatrixElement>;
-  Matrix r_converge = matrix;
+  Matrix r_converge{matrix};
   Matrix q_suffix = Matrix::Unit(matrix.Rows());
   for (Index index = 0; index < r_converge.Cols() && index < r_converge.Rows();
        ++index) {
@@ -18,8 +18,8 @@ QRResult<Matrix<MatrixElement>> HouseholderQR(
     auto transformation = detail::HouseholderReflection(
         Matrix{r_view.Col(index)});
 
-    r_view.Store(transformation.LeftApplication(r_view));
-    q_view.Store(transformation.LeftApplication(q_view));
+    transformation.ApplyLeft(r_view);
+    transformation.ApplyLeft(q_view);
   }
   return {Transposed(q_suffix), r_converge};
 }

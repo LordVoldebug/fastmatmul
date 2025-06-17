@@ -1,5 +1,6 @@
 #pragma once
 #include "matrix/matrix.h"
+#include "utils/arithmetics.h"
 #include "utils/types.h"
 
 namespace linalg_lib::detail {
@@ -8,14 +9,6 @@ template <MatrixOrViewType MatrixType>
 MatrixElementType<MatrixType> Norm(const MatrixType& vector) {
   assert(vector.Cols() == 1);
   return std::sqrt((Transposed(vector) * vector)(0, 0));
-}
-
-template <typename MatrixElement>
-MatrixElement Sign(MatrixElement element) {
-  if (element >= 0) {
-    return MatrixElement{1};
-  }
-  return MatrixElement{-1};
 }
 
 template <typename MatrixElement>
@@ -30,9 +23,15 @@ public:
   }
 
   template <MatrixOrViewType MatrixType>
-  Matrix<MatrixElement> LeftApplication(const MatrixType& matrix) {
-    return matrix - householder_vector_ * 2 * (Transposed(householder_vector_) * matrix);
+  void ApplyLeft(MatrixType&& matrix) {
+    matrix -= householder_vector_ * 2 * (Transposed(householder_vector_) * matrix);
   }
+
+  template <MatrixOrViewType MatrixType>
+  void ApplyRight(MatrixType&& matrix) {
+    matrix -= matrix * householder_vector_ * 2 * Transposed(householder_vector_);
+  }
+
 private:
   Matrix<MatrixElement> householder_vector_; // TODO завести нормальный тип для вектора?
 };
