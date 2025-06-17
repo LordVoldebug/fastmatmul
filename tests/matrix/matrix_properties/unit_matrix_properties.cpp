@@ -1,5 +1,4 @@
 #include "linalg_lib.h"
-#include "utils/matrix_properties.h"
 #include "utils/arithmetics.h"
 #include <gtest/gtest.h>
 

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include "linalg_lib.h"
-#include "utils/matrix_properties.h"
 
 TEST(GivensQRTest, Unit) {
   linalg_lib::Matrix<double> A = {

@@ -1,7 +1,28 @@
 #pragma once
-#include "matrix/matrix.h"
+#include "utils/types.h"
+#include "utils/arithmetics.h"
 
 namespace linalg_lib::detail {
+
+template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
+bool DimensionMatches(const LMatrix& lhs, const RMatrix& rhs) {
+  return lhs.Rows() == rhs.Rows() && lhs.Cols() == rhs.Cols();
+}
+
+// Тут просто typename, потому что она же для SparseLinearTransformation
+// а полноценно их в общую логику выделить ну можно но только сюда что ли?...
+// тем более SparseLinearTransformation достаточно сервисный объект, у него нет
+// полноценной семантики разреженной матрицы... даже если и стоит, то короче потом
+template <typename LMatrix, typename RMatrix>
+bool DimensionMultiplicationMatches(const LMatrix& lhs, const RMatrix& rhs) {
+  return lhs.Cols() == rhs.Rows();
+}
+
+template <MatrixOrViewType Matrix>
+bool IsSquare(const Matrix& matrix) {
+  return matrix.Cols() == matrix.Rows();
+}
+
 template <MatrixOrViewType Matrix>
 bool IsUnit(const Matrix& matrix) {
   return IsEpsilonEqual(matrix, OwnedMatrix<Matrix>::Unit(matrix.Rows()));
