@@ -1,4 +1,5 @@
-file(GLOB TEST_SRCS "*.cpp")
+file(GLOB_RECURSE TEST_SRCS CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 foreach (src IN LISTS TEST_SRCS)
     get_filename_component(name ${src} NAME_WE)

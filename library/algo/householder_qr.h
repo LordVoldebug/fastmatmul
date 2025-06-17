@@ -11,8 +11,8 @@ QRResult<OwnedMatrix<Matrix>> HouseholderQR(const Matrix& matrix) {
   OwnedMatrix q_suffix = Matrix::Unit(matrix.Rows());
   for (Index index = 0; index < r_converge.Cols() && index < r_converge.Rows();
        ++index) {
-    auto r_view = r_converge.SubMatrix(index, 0);
-    auto q_view = q_suffix.SubMatrix(index, 0);
+    auto r_view = r_converge.MutView().SubMatrix(index, 0);
+    auto q_view = q_suffix.MutView().SubMatrix(index, 0);
 
     auto transformation = detail::HouseholderReflection(
         Matrix{r_view.Col(index)});

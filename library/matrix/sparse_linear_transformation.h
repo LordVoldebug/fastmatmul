@@ -51,7 +51,7 @@ public:
     assert(DimensionMultiplicationMatches(lhs, rhs));
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [rhs_row, rhs_col, rhs_val] : rhs.elements_) {
-      res.Col(rhs_col) += lhs.Col(rhs_row) * rhs_val;
+      res.MutView().Col(rhs_col) += lhs.ConstView().Col(rhs_row) * rhs_val;
     }
     return res;
   }
@@ -62,7 +62,7 @@ public:
     assert(DimensionMultiplicationMatches(lhs, rhs));
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [lhs_row, lhs_col, lhs_val] : lhs.elements_) {
-      res.Row(lhs_row) += rhs.Row(lhs_col) * lhs_val;
+      res.MutView().lhs_row += rhs.ConstView().Row(lhs_col) * lhs_val;
     }
     return res;
   }

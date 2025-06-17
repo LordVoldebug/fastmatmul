@@ -27,7 +27,6 @@ bool IsSquare(const Matrix& matrix) {
   return matrix.Cols() == matrix.Rows();
 }
 
-
 template <Numeric MatrixElement>
 class Matrix {
 public:
@@ -74,26 +73,12 @@ public:
     return storage_.Cols();
   }
 
-  auto View(this auto&& self) {
+  auto MutView(this auto&& self) {
     return MatrixView(self, Index{0}, Index{0}, self.Rows(), self.Cols());
   }
 
-  auto SubMatrix(this auto&& self, Index start_row, Index start_col) {
-    return self.View().SubMatrix(start_row, start_col);
-  }
-
-  auto SubMatrix(this auto&& self, Index start_row, Index start_col,
-                      Size row_count,
-                      Size col_count) {
-    return self.View().SubMatrix(start_row, start_col, row_count, col_count);
-  }
-
-  auto Row(this auto&& self, Index row) {
-    return self.View().Row(row);
-  }
-
-  auto Col(this auto&& self, Index col) {
-    return self.View().Col(col);
+  auto ConstView(this auto&& self) {
+    return MatrixView(self, Index{0}, Index{0}, self.Rows(), self.Cols()).ConstView();
   }
 
   static Matrix Unit(Size rows) {
@@ -183,9 +168,17 @@ public:
     return self.matrix_.get()(row + self.start_row_, col + self.start_col_);
   }
 
-  auto View(this auto&& self) {
+  auto MutView(this auto&& self) {
     return MatrixView(self.matrix_.get(), Index{0}, Index{0}, self.Rows(),
                       self.Cols());
+  }
+
+  MatrixView<const RawMatrixType&> ConstView() const {
+    return MatrixView<const RawMatrixType&>(
+        matrix_.get(),
+        start_row_, start_col_,
+        rows_, cols_
+        );
   }
 
   auto SubMatrix(this auto&& self, Index start_row, Index start_col) {
@@ -249,14 +242,6 @@ public:
 
   MatrixRangeType MatrixRange() const {
     return MatrixRangeType(rows_, cols_);
-  }
-
-  MatrixView<const RawMatrixType&> ConstView() const {
-    return MatrixView<const RawMatrixType&>(
-        matrix_.get(),
-        start_row_, start_col_,
-        rows_, cols_
-        );
   }
 
 private:
