@@ -5,7 +5,7 @@
 #include "matrix/sparse_linear_transformation.h"
 
 namespace linalg_lib::detail {
-template <typename MatrixElement>
+template <Numeric MatrixElement>
 class GivensRotation {
   // Хотел делать через SparseMatrixTransformation, под гиивенса его писал
   // Но потом осознал (уже после того как написал реализацию), что полную sparse-матрицу

@@ -28,7 +28,7 @@ bool IsSquare(const Matrix& matrix) {
 }
 
 
-template <typename MatrixElement>
+template <Numeric MatrixElement>
 class Matrix {
 public:
   using StorageType = detail::MatrixStorage<MatrixElement>;

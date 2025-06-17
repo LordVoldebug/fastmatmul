@@ -4,12 +4,11 @@
 #include "housholder.h"
 
 namespace linalg_lib {
-template <typename MatrixElement>
-QRResult<Matrix<MatrixElement>> HouseholderQR(
-    const Matrix<MatrixElement>& matrix) {
-  using Matrix = Matrix<MatrixElement>;
-  Matrix r_converge{matrix};
-  Matrix q_suffix = Matrix::Unit(matrix.Rows());
+template <MatrixOrViewType Matrix>
+QRResult<OwnedMatrix<Matrix>> HouseholderQR(const Matrix& matrix) {
+  using OwnedMatrix = OwnedMatrix<Matrix>;
+  OwnedMatrix r_converge{matrix};
+  OwnedMatrix q_suffix = Matrix::Unit(matrix.Rows());
   for (Index index = 0; index < r_converge.Cols() && index < r_converge.Rows();
        ++index) {
     auto r_view = r_converge.SubMatrix(index, 0);

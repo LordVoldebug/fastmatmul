@@ -34,5 +34,7 @@ public:
 
 private:
   Matrix<MatrixElement> householder_vector_; // TODO завести нормальный тип для вектора?
+  // Но как нибудь потом, если вдруг успею писать то что больше про векторы
+  // а то пока непонятно как он должен по хорошему выглядит...
 };
 } // namespace linalg_lib::detail

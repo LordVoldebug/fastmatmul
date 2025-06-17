@@ -8,7 +8,7 @@ using Size = int64_t;
 template<typename T>
 concept Numeric = std::integral<T> || std::floating_point<T>;
 
-template <typename MatrixType>
+template <Numeric MatrixType>
 class Matrix;
 
 template <typename>
