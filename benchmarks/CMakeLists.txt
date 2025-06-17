@@ -1,4 +1,5 @@
-file(GLOB BENCH_SRCS "*.cpp")
+file(GLOB_RECURSE BENCH_SRCS CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 foreach (src IN LISTS BENCH_SRCS)
     get_filename_component(name ${src} NAME_WE)
