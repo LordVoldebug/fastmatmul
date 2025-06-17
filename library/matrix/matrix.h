@@ -25,6 +25,17 @@ public:
     for (auto [row, col] : MatrixRange()) {
       (*this)(row, col) = view(row, col);
     }
+    // Общая архитектурная ремарка: я думал о том чтобы сделать итераторы
+    // в фиксированном порядке, и делать ranges::transform/ranges::zip
+    // но мне показалось, что так лучше (потому что опять таки у матриц
+    // потенциально может быть разный layout
+
+    // Я думал что что может стоит сделать Apply который принимает лямбду с row и col и ссылкой на объект
+    // но я подумал что уже с MatrixRange() достаточно читаемо
+    // и более локально (передаем лямбду, которая храниит в себе ссылку,
+    // еще не запутаться где row col где сам элемент..
+    // Короче считаю что лучше через итератор по самим элементам явно
+
   }
 
   Matrix(std::initializer_list<std::initializer_list<MatrixElement>> data) :
@@ -51,12 +62,12 @@ public:
     return storage_.Cols();
   }
 
-  auto MutView(this auto&& self) {
-    return MatrixView(self, Index{0}, Index{0}, self.Rows(), self.Cols());
+  MatrixView<Matrix&> MutView() {
+    return MatrixView<Matrix&>(*this, Index{0}, Index{0}, Rows(), Cols());
   }
 
-  auto ConstView(this auto&& self) {
-    return MatrixView(self, Index{0}, Index{0}, self.Rows(), self.Cols()).ConstView();
+  MatrixView<const Matrix&> ConstView() const {
+    return MatrixView<const Matrix&>(*this, Index{0}, Index{0}, Rows(), Cols());
   }
 
   static Matrix Unit(Size rows) {
@@ -66,7 +77,6 @@ public:
     }
     return res;
   }
-
 
   MatrixRangeType MatrixRange() const {
     return storage_.MatrixRange();
