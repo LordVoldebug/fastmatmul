@@ -7,7 +7,7 @@
 
 namespace linalg_lib {
 
-template <MatrixOrViewType Matrix>
+template <MutableMatrixOrViewType Matrix>
 void Apply(Matrix&& matrix,
            const std::function<void(MatrixElementType<Matrix>&)>& operation) {
   for (auto [row, col] : matrix.MatrixRange()) {
@@ -15,7 +15,11 @@ void Apply(Matrix&& matrix,
   }
 }
 
-template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
+// LHS под UniversalReference чтобы можно было писать что-то вроде
+// A.View().Submatrix(1, 1) += ...
+// очень хотелось бы как нибудь выделить в одно место эти UniversalReferences
+// в какой-нибудь именованный концепт или что нибудь такое но кажется так нельзя
+template <MutableMatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
   assert(detail::DimensionMatches(lhs, rhs));
   for (auto [row, col] : lhs.MatrixRange()) {
@@ -24,6 +28,12 @@ LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
   return lhs;
 }
 
+
+// а тут universal кажется не обязателен (вроде буквально единичные мувы экономит)
+// по крайней мере мне не приходит в голову сценария, когда будет тормозить
+// но копировать явно все равно придется, чтобы с вьюшками логика работала
+// так что пусть уже будет, раз хоть что то экономит, да и так у нас полно этих
+// universal references, пусть уж живут для единообразия
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
   assert(detail::DimensionMatches(lhs, rhs));
@@ -32,7 +42,7 @@ OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
   return res;
 }
 
-template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
+template <MutableMatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix&& operator-=(LMatrix&& lhs, const RMatrix& rhs) {
   assert(detail::DimensionMatches(lhs, rhs));
   for (auto [row, col] : lhs.MatrixRange()) {
@@ -131,55 +141,56 @@ LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
 
 template <MatrixOrViewType Matrix>
 OwnedMatrix<Matrix> Transposed(const Matrix& matrix) {
-  OwnedMatrix<Matrix> ret(matrix.Cols(), matrix.Rows());
+  OwnedMatrix<Matrix> res(matrix.Cols(), matrix.Rows());
   for (auto [row, col] : matrix.MatrixRange()) {
-    ret(col, row) = matrix(row, col);
+    res(col, row) = matrix(row, col);
   }
-  return ret;
+  return res;
 }
 
-template <MatrixOrViewType Matrix>
-Matrix&& operator*=(Matrix&& matrix, MatrixElementType<Matrix> k) {
-  Apply(matrix, [k](auto& v) {
-    v *= k;
+template <MutableMatrixOrViewType Matrix>
+Matrix&& operator*=(Matrix&& matrix, MatrixElementType<Matrix> value) {
+  Apply(matrix, [value](MatrixElementType<Matrix>& v) {
+    v *= value;
   });
   return matrix;
 }
 
 template <MatrixOrViewType Matrix>
-OwnedMatrix<Matrix> operator*(const Matrix& matrix,
-                              MatrixElementType<Matrix> k) {
-  OwnedMatrix<Matrix> res(matrix);
-  res *= k;
+OwnedMatrix<Matrix> operator*(Matrix&& matrix,
+                              MatrixElementType<Matrix> value) {
+  OwnedMatrix<Matrix> res(std::forward<Matrix>(matrix));
+  res *= value;
   return res;
 }
 
+
 template <MatrixOrViewType Matrix>
-Matrix&& operator /=(Matrix&& matrix, MatrixElementType<Matrix> k) {
-  Apply(matrix, [k](auto& v) {
-    v /= k;
+OwnedMatrix<Matrix> operator*(MatrixElementType<Matrix> value,
+                              Matrix&& matrix) {
+  return std::forward<Matrix>(matrix) * value;
+}
+
+template <MutableMatrixOrViewType Matrix>
+Matrix&& operator/=(Matrix&& matrix, MatrixElementType<Matrix> value) {
+  Apply(matrix, [value](MatrixElementType<Matrix>& v) {
+    v /= value;
   });
   return matrix;
 }
 
 template <MatrixOrViewType Matrix>
-OwnedMatrix<Matrix> operator/(const Matrix& matrix,
-                              MatrixElementType<Matrix> k) {
-  OwnedMatrix<Matrix> res(matrix);
-  res /= k;
+OwnedMatrix<Matrix> operator/(Matrix&& matrix,
+                              MatrixElementType<Matrix> value) {
+  OwnedMatrix<Matrix> res(std::forward<Matrix>(matrix));
+  res /= value;
   return res;
 }
 
 template <MatrixOrViewType Matrix>
-OwnedMatrix<Matrix> operator*(MatrixElementType<Matrix> k,
-                              const Matrix& matrix) {
-  return matrix * k;
-}
-
-template <MatrixOrViewType Matrix>
-OwnedMatrix<Matrix> operator-(const Matrix& matrix) {
-  OwnedMatrix<Matrix> res(matrix);
-  Apply(res, [](auto& v) {
+OwnedMatrix<Matrix> operator-(Matrix&& matrix) {
+  OwnedMatrix<Matrix> res(std::forward<Matrix>(matrix));
+  Apply(res, [](MatrixElementType<Matrix>& v) {
     v = -v;
   });
   return res;

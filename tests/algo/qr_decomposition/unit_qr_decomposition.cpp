@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
+#include <functional>
 #include "linalg_lib.h"
 
 TEST(GivensQRTest, Unit) {
@@ -28,6 +29,15 @@ TEST(HouseholderQR, Unit) {
   EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(Q));
   EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * R));
   EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(R));
+}
+
+
+TEST(GivensQRTest, PRINT) {
+  linalg_lib::Matrix<double> A = {
+    { 4.0,  1.0},
+    { 2.0,  5.0}
+  };
+
 }
 
 /*

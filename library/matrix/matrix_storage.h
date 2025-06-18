@@ -59,7 +59,7 @@ private:
   Size rows_, cols_;
 };
 
-template <typename MatrixElement>
+template <Numeric MatrixElement>
 class MatrixStorage {
 public:
   using MatrixRangeType = MatrixRangeImpl;

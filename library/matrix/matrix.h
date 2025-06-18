@@ -62,12 +62,12 @@ public:
     return storage_.Cols();
   }
 
-  MatrixView<Matrix&> MutView() {
-    return MatrixView<Matrix&>(*this, Index{0}, Index{0}, Rows(), Cols());
+  MatrixView<Matrix> MutView() {
+    return MatrixView<Matrix>(*this, Index{0}, Index{0}, Rows(), Cols());
   }
 
-  MatrixView<const Matrix&> ConstView() const {
-    return MatrixView<const Matrix&>(*this, Index{0}, Index{0}, Rows(), Cols());
+  MatrixView<const Matrix> ConstView() const {
+    return MatrixView<const Matrix>(*this, Index{0}, Index{0}, Rows(), Cols());
   }
 
   static Matrix Unit(Size rows) {
@@ -100,6 +100,8 @@ private:
   // и это не испортится, если мы там под ногами у нас поменяем хранение
   // (это будет локальное изменние именно в логике хранения)
   // между column-major на row-major
-  // Но то что большинство методов я просто форваржу мне не очень нравится...
+  // Но то что большинство методов я просто форваржу мне мб и не очень нравится...
+  // но наследовать наверное не хочу из соображений явности пробрасывания и локальности логики,
+  // вдруг какие то методы в storage захочется добавлять
 };
 } // namespace linalg_lib

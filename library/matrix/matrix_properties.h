@@ -10,7 +10,8 @@ bool DimensionMatches(const LMatrix& lhs, const RMatrix& rhs) {
 }
 
 // Тут просто typename, потому что она же для SparseLinearTransformation
-// а полноценно их в общую логику выделить ну можно но только сюда что ли?...
+// а полноценно их в общую логику выделить ну можно но только сюда что ли?..
+// и я сходу не придумал как такое должно называться
 // тем более SparseLinearTransformation достаточно сервисный объект, у него нет
 // полноценной семантики разреженной матрицы... даже если и стоит, то короче потом
 template <typename LMatrix, typename RMatrix>
@@ -36,10 +37,9 @@ bool IsOrthonormal(const Matrix& matrix) {
 
 template <MatrixOrViewType Matrix>
 bool IsDiagonal(const Matrix& matrix) {
-  using MatrixElement = MatrixElementType<Matrix>;
   for (auto [row, col] : matrix.MatrixRange()) {
     if (row != col) {
-      if (!IsEpsilonEqual(matrix(row, col), MatrixElement{0})) {
+      if (!IsEpsilonEqualZero(matrix(row, col))) {
         return false;
       }
     }
@@ -49,10 +49,9 @@ bool IsDiagonal(const Matrix& matrix) {
 
 template <MatrixOrViewType Matrix>
 bool IsUpperBidiagonal(const Matrix& matrix) {
-  using MatrixElement = MatrixElementType<Matrix>;
   for (auto [row, col] : matrix.MatrixRange()) {
     if (row != col && row + 1 != col) {
-      if (!IsEpsilonEqual(matrix(row, col), MatrixElement{0})) {
+      if (!IsEpsilonEqualZero(matrix(row, col))) {
         return false;
       }
     }
@@ -62,11 +61,9 @@ bool IsUpperBidiagonal(const Matrix& matrix) {
 
 template <MatrixOrViewType Matrix>
 bool IsUpperTriangular(const Matrix& matrix) {
-  using MatrixElement = MatrixElementType<Matrix>;
-
   for (Index row = 0; row < matrix.Rows(); ++row) {
     for (Index col = 0; col < row && col < matrix.Cols(); ++col) {
-      if (!IsEpsilonEqual(matrix(row, col), MatrixElement{0})) {
+      if (!IsEpsilonEqualZero(matrix(row, col))) {
         return false;
       }
     }
@@ -76,11 +73,9 @@ bool IsUpperTriangular(const Matrix& matrix) {
 
 template <MatrixOrViewType Matrix>
 bool IsHessenberg(const Matrix& matrix) {
-  using MatrixElement = MatrixElementType<Matrix>;
-
   for (Index row = 1; row < matrix.Rows(); ++row) {
     for (Index col = 0; col + 1 < row && col < matrix.Cols(); ++col) {
-      if (!IsEpsilonEqual(matrix(row, col), MatrixElement{0})) {
+      if (!IsEpsilonEqualZero(matrix(row, col))) {
         return false;
       }
     }

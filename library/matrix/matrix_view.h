@@ -3,26 +3,23 @@
 #include "utils/types.h"
 
 namespace linalg_lib {
+
 // TODO может быть поддержать транспониированную вьюшку?
 // Но как нибудь потом...
-template <MatrixType BaseMatrix>
+template <OwnedMatrixType BaseMatrix>
 class MatrixView {
 public:
-  using RawMatrixType = std::remove_reference_t<BaseMatrix>;
+  using RawMatrixType = std::remove_cv_t<BaseMatrix>;
   using MatrixRangeType = typename RawMatrixType::MatrixRangeType;
-  using MatrixElement = MatrixElementType<RawMatrixType>;
-  using MatrixElementRefType = std::conditional_t<std::is_const_v<BaseMatrix>,
-                                                  const MatrixElement&,
-                                                  MatrixElement&>;
 
 private:
-  friend Matrix<MatrixElement>;
-  template <MatrixType>
-  friend class MatrixView;
+
 
   // хочу сделать этот конструктор деталью реализации, чтобы
   // со стороны всегда View создавалась через методы матрицы
   // сделать конструктор private и объявить freind показалось хорошей идеей тут...
+
+  friend RawMatrixType;
 
   MatrixView(BaseMatrix& matrix, Size start_row, Size start_col, Size rows,
              Size cols)
@@ -49,12 +46,12 @@ public:
     return self.matrix_.get()(row + self.start_row_, col + self.start_col_);
   }
 
-  MatrixView<RawMatrixType&> MutView() {
-    return MatrixView<RawMatrixType&>(matrix_.get(), Index{0}, Index{0}, Rows(), Cols());
+  MatrixView<RawMatrixType> MutView() {
+    return MatrixView<RawMatrixType>(matrix_.get(), Index{0}, Index{0}, Rows(), Cols());
   }
 
-  MatrixView<const RawMatrixType&> ConstView() const {
-    return MatrixView<const RawMatrixType&>(
+  MatrixView<const RawMatrixType> ConstView() const {
+    return MatrixView<const RawMatrixType>(
         matrix_.get(),
         start_row_, start_col_,
         rows_, cols_
@@ -118,7 +115,7 @@ public:
   }
 
 private:
-  std::reference_wrapper<RawMatrixType> matrix_;
+  std::reference_wrapper<BaseMatrix> matrix_;
   Size start_row_ = 0, start_col_ = 0;
   Size rows_ = 0, cols_ = 0;
 };

@@ -11,6 +11,12 @@ bool IsEpsilonEqual(MatrixElement lhs, MatrixElement rhs) {
 }
 
 template <Numeric MatrixElement>
+bool IsEpsilonEqualZero(MatrixElement element) {
+  return std::abs(element) < kEps;
+}
+
+
+template <Numeric MatrixElement>
 MatrixElement Sign(MatrixElement element) {
   if (element >= 0) {
     return MatrixElement{1};
