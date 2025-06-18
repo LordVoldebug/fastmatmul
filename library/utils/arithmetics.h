@@ -23,4 +23,4 @@ MatrixElement Sign(MatrixElement element) {
   return MatrixElement{-1};
 }
 
-} // namespace linalg_lib::detail
+}  // namespace linalg_lib

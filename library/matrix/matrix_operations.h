@@ -28,12 +28,11 @@ LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
   return lhs;
 }
 
-
-// а тут universal кажется не обязателен (вроде буквально единичные мувы экономит)
-// по крайней мере мне не приходит в голову сценария, когда будет тормозить
-// но копировать явно все равно придется, чтобы с вьюшками логика работала
-// так что пусть уже будет, раз хоть что то экономит, да и так у нас полно этих
-// universal references, пусть уж живут для единообразия
+// а тут universal кажется не обязателен (вроде буквально единичные мувы
+// экономит) по крайней мере мне не приходит в голову сценария, когда будет
+// тормозить но копировать явно все равно придется, чтобы с вьюшками логика
+// работала так что пусть уже будет, раз хоть что то экономит, да и так у нас
+// полно этих universal references, пусть уж живут для единообразия
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
@@ -90,8 +89,9 @@ std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
   out << '{';
   for (Index row = 0; row < matrix.Rows(); ++row) {
     if (row != 0) {
-      out << ',' << '\n' << ' '; // сомневался, не лучше ли выводить строку
-      // но логически показалось что лучше по символам (в выводе +- за разное отвечают)
+      out << ',' << '\n' << ' ';  // сомневался, не лучше ли выводить строку
+      // но логически показалось что лучше по символам (в выводе +- за разное
+      // отвечают)
     }
     out << "{";
     for (Index col = 0; col < matrix.Cols(); ++col) {
@@ -109,15 +109,13 @@ std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-OwnedMatrix<LMatrix> operator
-*(const LMatrix& lhs, const RMatrix& rhs) {
+OwnedMatrix<LMatrix> operator*(const LMatrix& lhs, const RMatrix& rhs) {
   assert(DimensionMultiplicationMatches(lhs, rhs));
   OwnedMatrix<LMatrix> res(lhs.Rows(), rhs.Cols());
   Size iter_size = lhs.Cols();
   for (auto [res_row, res_col] : res.MatrixRange()) {
     for (Index res_iter = 0; res_iter < iter_size; ++res_iter) {
-      res(res_row, res_col) += lhs(res_row, res_iter) * rhs(
-          res_iter, res_col);
+      res(res_row, res_col) += lhs(res_row, res_iter) * rhs(res_iter, res_col);
     }
   }
   return res;
@@ -164,7 +162,6 @@ OwnedMatrix<Matrix> operator*(Matrix&& matrix,
   return res;
 }
 
-
 template <MatrixOrViewType Matrix>
 OwnedMatrix<Matrix> operator*(MatrixElementType<Matrix> value,
                               Matrix&& matrix) {
@@ -195,4 +192,4 @@ OwnedMatrix<Matrix> operator-(Matrix&& matrix) {
   });
   return res;
 }
-} // namespace linalg_lib
+}  // namespace linalg_lib
