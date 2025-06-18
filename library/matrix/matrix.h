@@ -7,21 +7,23 @@
 namespace linalg_lib {
 template <Numeric MatrixElement>
 class Matrix {
-public:
+ public:
   using StorageType = detail::MatrixStorage<MatrixElement>;
   using MatrixRangeType = typename StorageType::MatrixRangeType;
 
   Matrix() = default;
 
-  Matrix(Size rows, Size cols) : storage_(rows, cols) {
+  Matrix(Size rows, Size cols)
+      : storage_(rows, cols) {
   }
 
-  explicit Matrix(Size rows) : storage_(rows, rows) {
+  explicit Matrix(Size rows)
+      : storage_(rows, rows) {
   }
 
   template <MatrixViewType ViewType>
-  explicit Matrix(ViewType view) : Matrix(
-      view.Rows(), view.Cols()) {
+  explicit Matrix(ViewType view)
+      : Matrix(view.Rows(), view.Cols()) {
     for (auto [row, col] : MatrixRange()) {
       (*this)(row, col) = view(row, col);
     }
@@ -30,16 +32,15 @@ public:
     // но мне показалось, что так лучше (потому что опять таки у матриц
     // потенциально может быть разный layout
 
-    // Я думал что что может стоит сделать Apply который принимает лямбду с row и col и ссылкой на объект
-    // но я подумал что уже с MatrixRange() достаточно читаемо
-    // и более локально (передаем лямбду, которая храниит в себе ссылку,
+    // Я думал что что может стоит сделать Apply который принимает лямбду с row
+    // и col и ссылкой на объект но я подумал что уже с MatrixRange() достаточно
+    // читаемо и более локально (передаем лямбду, которая храниит в себе ссылку,
     // еще не запутаться где row col где сам элемент..
     // Короче считаю что лучше через итератор по самим элементам явно
-
   }
 
-  Matrix(std::initializer_list<std::initializer_list<MatrixElement>> data) :
-    storage_(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
+  Matrix(std::initializer_list<std::initializer_list<MatrixElement>> data)
+      : storage_(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
     for (Index row = 0; row < storage_.Rows(); ++row) {
       assert(data.begin()[row].size() == storage_.Cols());
       for (Index col = 0; col < storage_.Cols(); ++col) {
@@ -86,22 +87,22 @@ public:
     return 0 <= row && row < Rows() && 0 <= col && col < Cols();
   }
 
-private:
+ private:
   StorageType storage_;
   // Возможно лишняя абстракция, у меня нет сильного мнения
   // Логически хотелось сказать, что матрица это расширение двумерного массива
-  // а уже то, как он внутри там устроен (чтобы лучше в кэши укладываться и т. п)
-  // это уже не наша ответсвенность. тут проблема в том, что кажется нельзя
+  // а уже то, как он внутри там устроен (чтобы лучше в кэши укладываться и т.
+  // п) это уже не наша ответсвенность. тут проблема в том, что кажется нельзя
   // в полной мере разделить абстракции, и скажем в эффективном умножении
   // нам бы пригодилось бы знание о том, как внутри устроен storage
-  // с другой стороны, например, storage лучше знает о том, как он внутри устроен
-  // и например предоставляет итератор который позволяет в хорошем порядке матрицу обходить
-  // и предоставляет именно сам порядок, а не какие-то обертки по применению функций
-  // и это не испортится, если мы там под ногами у нас поменяем хранение
-  // (это будет локальное изменние именно в логике хранения)
-  // между column-major на row-major
-  // Но то что большинство методов я просто форваржу мне мб и не очень нравится...
-  // но наследовать наверное не хочу из соображений явности пробрасывания и локальности логики,
-  // вдруг какие то методы в storage захочется добавлять
+  // с другой стороны, например, storage лучше знает о том, как он внутри
+  // устроен и например предоставляет итератор который позволяет в хорошем
+  // порядке матрицу обходить и предоставляет именно сам порядок, а не какие-то
+  // обертки по применению функций и это не испортится, если мы там под ногами у
+  // нас поменяем хранение (это будет локальное изменние именно в логике
+  // хранения) между column-major на row-major Но то что большинство методов я
+  // просто форваржу мне мб и не очень нравится... но наследовать наверное не
+  // хочу из соображений явности пробрасывания и локальности логики, вдруг какие
+  // то методы в storage захочется добавлять
 };
-} // namespace linalg_lib
+}  // namespace linalg_lib

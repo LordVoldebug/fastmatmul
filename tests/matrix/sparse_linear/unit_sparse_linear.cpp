@@ -6,7 +6,7 @@ TEST(SparseLinearTransformationOps, SquareLeftRightMul) {
     linalg_lib::Matrix<int> A = {
         {1, 2, 3},
         {4, 5, 6},
-        {7, 8, 9}
+        {7, 8, 9},
     };
 
     linalg_lib::detail::SparseLinearTransformation<int> S(3, 3);
@@ -24,7 +24,7 @@ TEST(SparseLinearTransformationOps, SquareLeftRightMul) {
     linalg_lib::Matrix<int> expected = {
         {30, 36, 42},
         {66, 81, 96},
-        {102, 126, 150}
+        {102, 126, 150},
     };
     EXPECT_TRUE(C == expected);
   }
@@ -33,7 +33,7 @@ TEST(SparseLinearTransformationOps, SquareLeftRightMul) {
     linalg_lib::Matrix<int> A = {
         {1, 2, 3},
         {4, 5, 6},
-        {7, 8, 9}
+        {7, 8, 9},
     };
 
     linalg_lib::detail::SparseLinearTransformation<int> S(3, 3);
@@ -51,7 +51,7 @@ TEST(SparseLinearTransformationOps, SquareLeftRightMul) {
     linalg_lib::Matrix<int> expected = {
         {30, 36, 42},
         {66, 81, 96},
-        {102, 126, 150}
+        {102, 126, 150},
     };
     EXPECT_TRUE(C == expected);
   }
@@ -70,14 +70,11 @@ TEST(SparseLinearTransformationOps, NonSquareLeftRightMul) {
     linalg_lib::Matrix<int> B = {
         {1, 0, 2, 0},
         {0, 3, 0, 4},
-        {5, 0, 6, 0}
+        {5, 0, 6, 0},
     };
 
     linalg_lib::Matrix<int> C = S * B;
-    linalg_lib::Matrix<int> expected = {
-        {16, 6, 20, 8},
-        {34, 15, 44, 20}
-    };
+    linalg_lib::Matrix<int> expected = {{16, 6, 20, 8}, {34, 15, 44, 20}};
     EXPECT_TRUE(C == expected);
   }
 
@@ -94,7 +91,7 @@ TEST(SparseLinearTransformationOps, NonSquareLeftRightMul) {
         {1, 2},
         {3, 4},
         {5, 6},
-        {7, 8}
+        {7, 8},
     };
 
     linalg_lib::Matrix<int> C = P * S;
@@ -102,7 +99,7 @@ TEST(SparseLinearTransformationOps, NonSquareLeftRightMul) {
         {9, 12, 15},
         {19, 26, 33},
         {29, 40, 51},
-        {39, 54, 69}
+        {39, 54, 69},
     };
     EXPECT_TRUE(C == expected);
   }

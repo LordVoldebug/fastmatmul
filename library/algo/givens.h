@@ -8,15 +8,18 @@ namespace linalg_lib::detail {
 template <Numeric MatrixElement>
 class GivensRotation {
   // Хотел делать через SparseMatrixTransformation, под гиивенса его писал
-  // Но потом осознал (уже после того как написал реализацию), что полную sparse-матрицу
-  // дорого умножать, так как много единиц, уже не куб, а квадрат коенчно, но можно же за линию
-  // Можно делать sparse матрицу итоговую, которую прибавляем  inplace, но дорого по накладным расходом
-  // и читаемости не особо прибавляется
-  // так что вручную :(
-  // но авось SparseMatrix потом для чего нибудь пригодится
-public:
-  GivensRotation(Index pos0, Index pos1, MatrixElement a0, MatrixElement a1) :
-    pos0_(pos0), pos1_(pos1), a0_(a0), a1_(a1) {
+  // Но потом осознал (уже после того как написал реализацию), что полную
+  // sparse-матрицу дорого умножать, так как много единиц, уже не куб, а квадрат
+  // коенчно, но можно же за линию Можно делать sparse матрицу итоговую, которую
+  // прибавляем  inplace, но дорого по накладным расходом и читаемости не особо
+  // прибавляется так что вручную :( но авось SparseMatrix потом для чего нибудь
+  // пригодится
+ public:
+  GivensRotation(Index pos0, Index pos1, MatrixElement a0, MatrixElement a1)
+      : pos0_(pos0),
+        pos1_(pos1),
+        a0_(a0),
+        a1_(a1) {
     if (IsEpsilonEqual(a1_, MatrixElement{0})) {
       a0_ = MatrixElement{1};
       a1_ = MatrixElement{1};
@@ -66,8 +69,8 @@ public:
     }
   }
 
-private:
+ private:
   Index pos0_, pos1_;
   MatrixElement a0_, a1_;
 };
-} // namespace linalg_lib::detail
+}  // namespace linalg_lib::detail
