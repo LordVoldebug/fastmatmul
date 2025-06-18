@@ -1,15 +1,15 @@
 #pragma once
 #include <cassert>
-#include <iterator>
+#include <set>
 #include <vector>
+#include <utility>
 #include "utils/types.h"
 #include "matrix.h"
 
 namespace linalg_lib::detail {
 template <typename MatrixElement>
 struct LinearTransformationEntry {
-  Index row;
-  Index col;
+  MatrixEntry matrix;
   MatrixElement value;
 };
 
@@ -29,14 +29,6 @@ class SparseLinearTransformation {
     elements_.push_back({row, col, value});
   }
 
-  // Надо ли в какой то момент проверять что все различные?
-  // В какой? Это долго просто, что-то хэшировать или сортировать
-  // так для пар еще и встроенного хэшера для хэшмапы нет
-  // Мне скорее хочется процитировать Рому Липовского
-  // https://ibb.co/nMN1tTDH
-  // Или строить заранее? но скорее не хочется логически в детали лезть, что это
-  // именно как список хранится
-
   Size Rows() const {
     return rows_;
   }
@@ -49,8 +41,10 @@ class SparseLinearTransformation {
   friend OwnedMatrix<Matrix> operator*(const Matrix& lhs,
                                        const SparseLinearTransformation& rhs) {
     assert(DimensionMultiplicationMatches(lhs, rhs));
+    assert(rhs.AreElementsUnique());
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
-    for (auto [rhs_row, rhs_col, rhs_val] : rhs.elements_) {
+    for (auto [matrix_entry, rhs_val] : rhs.elements_) {
+      auto [rhs_row, rhs_col] = matrix_entry;
       res.MutView().Col(rhs_col) += lhs.ConstView().Col(rhs_row) * rhs_val;
     }
     return res;
@@ -60,14 +54,34 @@ class SparseLinearTransformation {
   friend OwnedMatrix<Matrix> operator*(const SparseLinearTransformation& lhs,
                                        const Matrix& rhs) {
     assert(DimensionMultiplicationMatches(lhs, rhs));
+    assert(lhs.AreElementsUnique());
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
-    for (auto [lhs_row, lhs_col, lhs_val] : lhs.elements_) {
+    for (auto [matrix_entry, lhs_val] : lhs.elements_) {
+      auto [lhs_row, lhs_col] = matrix_entry;
       res.MutView().Row(lhs_row) += rhs.ConstView().Row(lhs_col) * lhs_val;
     }
     return res;
   }
 
  private:
+
+  bool AreElementsUnique() const {
+    auto comparator = [](const MatrixEntry& a, const MatrixEntry& b) {
+      return std::tie(a.row, a.col) < std::tie(b.row, b.col);
+    };
+    std::set<MatrixEntry, decltype(comparator)> entries(comparator);
+    // Логически, не то чтобы есть порядок на MatrixEntries
+    // и не то, чтобы порядок хочется выносить за пределы этой функции
+    // поэтому лямбдой, как бы это не выглядело
+    for (auto [matrix_entry, _] : elements_) {
+      if (entries.contains(matrix_entry)) {
+        return false;
+      }
+      entries.insert(matrix_entry);
+    }
+    return true;
+  }
+
   std::vector<LinearTransformationEntry> elements_;
   Size rows_;
   Size cols_;

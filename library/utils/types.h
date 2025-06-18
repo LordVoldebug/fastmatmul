@@ -72,6 +72,11 @@ template <typename T>
 concept MutableMatrixOrViewType =
     kIsMutableMatrixOrViewType<std::remove_cvref_t<T>>;
 
+struct MatrixEntry {
+  Index row;
+  Index col;
+};
+
 template <OwnedMatrixType Matrix>
 struct QRResult {
   Matrix Q;

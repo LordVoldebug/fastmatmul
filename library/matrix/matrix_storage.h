@@ -5,11 +5,9 @@
 #include "utils/types.h"
 
 namespace linalg_lib::detail {
-struct MatrixEntry {
-  Index row;
-  Index col;
-};
 
+// Логика MatrixEntryIterator принадлежит стораджу
+// поэтому в том же файле
 class MatrixEntryIterator {
  public:
   using iterator_category = std::forward_iterator_tag;  // NOLINT
