@@ -27,13 +27,6 @@ TEST(HouseholderQR, Unit) {
   EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
 }
 
-
-TEST(GivensQRTest, PRINT) {
-
-}
-
-
-
 /*
 TEST(GivensQRTest, PRINT) {
   linalg_lib::Matrix<double> A = {
