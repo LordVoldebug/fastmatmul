@@ -5,7 +5,7 @@
 #include "utils/arithmetics.h"
 
 namespace linalg_lib {
-template <OwnedMatrixType Matrix>
+template <MatrixType Matrix>
 QRResult<Matrix> GivensQR(const Matrix& matrix) {
   Matrix r_converge = matrix;
   Matrix q_suffix = Matrix::Unit(matrix.Rows());
