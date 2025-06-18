@@ -9,6 +9,11 @@ foreach (src IN LISTS TEST_SRCS)
             linalg_lib
             GTest::gtest_main
     )
+    target_include_directories(${name}
+            PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+
     include(GoogleTest)
     gtest_discover_tests(${name})
 endforeach ()

@@ -21,7 +21,7 @@ void Apply(Matrix&& matrix,
 // в какой-нибудь именованный концепт или что нибудь такое но кажется так нельзя
 template <MutableMatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
-  assert(detail::DimensionMatches(lhs, rhs));
+  assert(DimensionMatches(lhs, rhs));
   for (auto [row, col] : lhs.MatrixRange()) {
     lhs(row, col) += rhs(row, col);
   }
@@ -36,7 +36,7 @@ LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
 // universal references, пусть уж живут для единообразия
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
-  assert(detail::DimensionMatches(lhs, rhs));
+  assert(DimensionMatches(lhs, rhs));
   OwnedMatrix<LMatrix> res(std::forward<LMatrix>(lhs));
   res += rhs;
   return res;
@@ -44,7 +44,7 @@ OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
 
 template <MutableMatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix&& operator-=(LMatrix&& lhs, const RMatrix& rhs) {
-  assert(detail::DimensionMatches(lhs, rhs));
+  assert(DimensionMatches(lhs, rhs));
   for (auto [row, col] : lhs.MatrixRange()) {
     lhs(row, col) -= rhs(row, col);
   }
@@ -53,7 +53,7 @@ LMatrix&& operator-=(LMatrix&& lhs, const RMatrix& rhs) {
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 OwnedMatrix<LMatrix> operator-(LMatrix&& lhs, const RMatrix& rhs) {
-  assert(detail::DimensionMatches(lhs, rhs));
+  assert(DimensionMatches(lhs, rhs));
   OwnedMatrix<LMatrix> res(std::forward<LMatrix>(lhs));
   res -= rhs;
   return res;
@@ -61,7 +61,7 @@ OwnedMatrix<LMatrix> operator-(LMatrix&& lhs, const RMatrix& rhs) {
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 bool operator==(const LMatrix& lhs, const RMatrix& rhs) {
-  if (!detail::DimensionMatches(lhs, rhs)) {
+  if (!DimensionMatches(lhs, rhs)) {
     return false;
   }
   for (auto [row, col] : lhs.MatrixRange()) {
@@ -74,7 +74,7 @@ bool operator==(const LMatrix& lhs, const RMatrix& rhs) {
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 bool IsEpsilonEqual(const LMatrix& lhs, const RMatrix& rhs) {
-  if (!detail::DimensionMatches(lhs, rhs)) {
+  if (!DimensionMatches(lhs, rhs)) {
     return false;
   }
   for (auto [row, col] : lhs.MatrixRange()) {
@@ -111,7 +111,7 @@ std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 OwnedMatrix<LMatrix> operator
 *(const LMatrix& lhs, const RMatrix& rhs) {
-  assert(detail::DimensionMultiplicationMatches(lhs, rhs));
+  assert(DimensionMultiplicationMatches(lhs, rhs));
   OwnedMatrix<LMatrix> res(lhs.Rows(), rhs.Cols());
   Size iter_size = lhs.Cols();
   for (auto [res_row, res_col] : res.MatrixRange()) {
@@ -125,16 +125,16 @@ OwnedMatrix<LMatrix> operator
 
 template <MatrixType LMatrix, MatrixOrViewType RMatrix>
 LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
-  assert(detail::DimensionMultiplicationMatches(lhs, rhs));
+  assert(DimensionMultiplicationMatches(lhs, rhs));
   lhs = lhs * rhs;
   return lhs;
 }
 
 template <MatrixViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
-  assert(detail::DimensionMultiplicationMatches(lhs, rhs));
-  assert(detail::IsSquare(lhs));
-  assert(detail::IsSquare(rhs));
+  assert(DimensionMultiplicationMatches(lhs, rhs));
+  assert(IsSquare(lhs));
+  assert(IsSquare(rhs));
   lhs.Store(lhs * rhs);
   return lhs;
 }

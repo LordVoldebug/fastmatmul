@@ -2,7 +2,7 @@
 #include "utils/types.h"
 #include "utils/arithmetics.h"
 
-namespace linalg_lib::detail {
+namespace linalg_lib {
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 bool DimensionMatches(const LMatrix& lhs, const RMatrix& rhs) {
@@ -84,7 +84,7 @@ bool IsHessenberg(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsSymetric(const Matrix& matrix) {
+bool IsSymmetric(const Matrix& matrix) {
   if (matrix.Rows() != matrix.Cols()) {
     return false;
   }

@@ -3,7 +3,6 @@
 #include "utils/types.h"
 
 namespace linalg_lib {
-
 // TODO может быть поддержать транспониированную вьюшку?
 // Но как нибудь потом...
 template <OwnedMatrixType BaseMatrix>
@@ -13,8 +12,6 @@ public:
   using MatrixRangeType = typename RawMatrixType::MatrixRangeType;
 
 private:
-
-
   // хочу сделать этот конструктор деталью реализации, чтобы
   // со стороны всегда View создавалась через методы матрицы
   // сделать конструктор private и объявить freind показалось хорошей идеей тут...
@@ -47,7 +44,8 @@ public:
   }
 
   MatrixView<RawMatrixType> MutView() {
-    return MatrixView<RawMatrixType>(matrix_.get(), Index{0}, Index{0}, Rows(), Cols());
+    return MatrixView<RawMatrixType>(matrix_.get(), Index{0}, Index{0}, Rows(),
+                                     Cols());
   }
 
   MatrixView<const RawMatrixType> ConstView() const {
@@ -61,11 +59,12 @@ public:
   MatrixView SubMatrix(Index start_row, Index start_col) {
     assert(0 <= start_row && start_row <= Rows());
     assert(0 <= start_col && start_col <= Cols());
-    return SubMatrix(start_row, start_col, Rows() - start_row, Cols() - start_col);
+    return SubMatrix(start_row, start_col, Rows() - start_row,
+                     Cols() - start_col);
   }
 
   MatrixView SubMatrix(Index start_row, Index start_col,
-                      Size rows, Size cols) {
+                       Size rows, Size cols) {
     assert(rows >= 0);
     assert(cols >= 0);
     assert(0 <= start_row && start_row <= Rows());
@@ -75,7 +74,8 @@ public:
     // Мне не нравятся эти цепочки ассертов, но как их вынести сохранив
     // читаемость я не придумал (условно, LiesWithin внешней функцией
     // имхо менее читаемо (какой параметр есть кто?)
-    return MatrixView(matrix_.get(), start_row_ + start_row, start_col_ + start_col, rows, cols);
+    return MatrixView(matrix_.get(), start_row_ + start_row,
+                      start_col_ + start_col, rows, cols);
   }
 
   MatrixView Row(Index row) {
@@ -86,7 +86,8 @@ public:
 
   MatrixView Col(Index col) {
     assert(0 <= col && col < Cols());
-    return MatrixView(matrix_.get(), start_row_, start_col_ + col, Rows(), Size{1});
+    return MatrixView(matrix_.get(), start_row_, start_col_ + col, Rows(),
+                      Size{1});
   }
 
   template <MatrixOrViewType Matrix>
@@ -96,7 +97,7 @@ public:
     // не знаю правда, насколько хорошая идея в такой интерпретации
     // оставлять operator += etc (не лучше ли функцию отдельную сделать)
     // но наверное такую фичу хочется иметь для читаемости уже алго-кода
-    assert(detail::DimensionMatches(*this, rhs));
+    assert(DimensionMatches(*this, rhs));
     for (auto [row, col] : MatrixRange()) {
       (*this)(row, col) = rhs(row, col);
     }
@@ -119,5 +120,4 @@ private:
   Size start_row_ = 0, start_col_ = 0;
   Size rows_ = 0, cols_ = 0;
 };
-
 } // namespace linalg_lib

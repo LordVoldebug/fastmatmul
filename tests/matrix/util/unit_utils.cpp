@@ -19,23 +19,23 @@ TEST(IsEpsilonEqual, NearEqualAndNotEqual) {
 TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
   {
     auto A = linalg_lib::Matrix<double>::Unit(3);
-    EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
   }
   {
     linalg_lib::Matrix<double> A = {{0, 1}, {1, 0}};
-    EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
   }
   {
     linalg_lib::Matrix<double> A = {{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-    EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
   }
   {
     linalg_lib::Matrix<double> A = {{0, 0, 1}, {1, 0, 0}, {0, 1, 0}};
-    EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
   }
   {
     linalg_lib::Matrix<double> A = {{1, 2}, {3, 4}};
-    EXPECT_FALSE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_FALSE(linalg_lib::IsOrthonormal(A));
   }
   {
     double value = 1.0 / 3.0;
@@ -44,7 +44,7 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
         {-2 * value, 1 - 2 * value, -2 * value},
         {-2 * value, -2 * value, 1 - 2 * value}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(B));
+    EXPECT_TRUE(linalg_lib::IsOrthonormal(B));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -52,13 +52,13 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
       {1.0},
       {0.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
       {1.0, 0.0, 0.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_FALSE(linalg_lib::IsOrthonormal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -67,14 +67,14 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
       {0.0, 0.0},
       {0.0, 0.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
       {0.6,  0.8, 0.0},
       {0.8, -0.6, 1.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsOrthonormal(A));
+    EXPECT_FALSE(linalg_lib::IsOrthonormal(A));
   }
 }
 
@@ -82,7 +82,7 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
 TEST(IsUnit, UnitAndNonUnit) {
   {
     linalg_lib::Matrix<double> A = linalg_lib::Matrix<double>::Unit(3);
-    EXPECT_TRUE(linalg_lib::detail::IsUnit(A));
+    EXPECT_TRUE(linalg_lib::IsUnit(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -90,14 +90,14 @@ TEST(IsUnit, UnitAndNonUnit) {
         {0.0, 2.0, 0.0},
         {0.0, 0.0, 1.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsUnit(A));
+    EXPECT_FALSE(linalg_lib::IsUnit(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {1.0, 0.0, 0.0},
         {0.0, 1.0, 0.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsUnit(A));
+    EXPECT_FALSE(linalg_lib::IsUnit(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -105,14 +105,14 @@ TEST(IsUnit, UnitAndNonUnit) {
         {0.0, 1.0},
         {0.0, 0.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsUnit(A));
+    EXPECT_FALSE(linalg_lib::IsUnit(A));
   }
 }
 
 TEST(IsDiagonal, DiagonalAndNonDiagonal) {
   {
     linalg_lib::Matrix<double> A = linalg_lib::Matrix<double>::Unit(4);
-    EXPECT_TRUE(linalg_lib::detail::IsDiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsDiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -121,14 +121,14 @@ TEST(IsDiagonal, DiagonalAndNonDiagonal) {
         {0.0, 0.0, 2.0, 0.0},
         {0.0, 0.0, 0.0, 1.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsDiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsDiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {1.0, 0.0, 0.0},
         {0.0, 2.0, 0.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsDiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsDiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -136,7 +136,7 @@ TEST(IsDiagonal, DiagonalAndNonDiagonal) {
         {0.0, 2.0},
         {0.0, 0.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsDiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsDiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -144,7 +144,7 @@ TEST(IsDiagonal, DiagonalAndNonDiagonal) {
         {0.0, 2.0, 0.0},
         {0.0, 0.0, 3.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsDiagonal(A));
+    EXPECT_FALSE(linalg_lib::IsDiagonal(A));
   }
 }
 
@@ -156,11 +156,11 @@ TEST(IsUpperBidiagonal, BidiagonalAndNonBidiagonal) {
         {0.0, 0.0, 5.0, 6.0},
         {0.0, 0.0, 0.0, 7.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsUpperBidiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsUpperBidiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = linalg_lib::Matrix<double>::Unit(4);
-    EXPECT_TRUE(linalg_lib::detail::IsUpperBidiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsUpperBidiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -169,14 +169,14 @@ TEST(IsUpperBidiagonal, BidiagonalAndNonBidiagonal) {
         {0.0, 0.0, 5.0, 6.0},
         {0.0, 0.0, 0.0, 7.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsUpperBidiagonal(A));
+    EXPECT_FALSE(linalg_lib::IsUpperBidiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {1.0, 2.0, 0.0},
         {0.0, 3.0, 4.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsUpperBidiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsUpperBidiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -184,14 +184,14 @@ TEST(IsUpperBidiagonal, BidiagonalAndNonBidiagonal) {
         {0.0, 3.0},
         {0.0, 0.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsUpperBidiagonal(A));
+    EXPECT_TRUE(linalg_lib::IsUpperBidiagonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {1.0, 2.0, 0.0},
         {5.0, 3.0, 4.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsUpperBidiagonal(A));
+    EXPECT_FALSE(linalg_lib::IsUpperBidiagonal(A));
   }
 }
 
@@ -203,7 +203,7 @@ TEST(IsUpperTriangular, UpperTriangularAndNonUpperTriangular) {
         {0.0, 0.0, 8.0, 9.0},
         {0.0, 0.0, 0.0, 1.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(A));
+    EXPECT_TRUE(linalg_lib::IsUpperTriangular(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -212,14 +212,14 @@ TEST(IsUpperTriangular, UpperTriangularAndNonUpperTriangular) {
         {0.0, 1.0, 8.0, 9.0},
         {0.0, 0.0, 0.0, 1.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsUpperTriangular(A));
+    EXPECT_FALSE(linalg_lib::IsUpperTriangular(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {1.0, 2.0, 3.0},
         {0.0, 4.0, 5.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(A));
+    EXPECT_TRUE(linalg_lib::IsUpperTriangular(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -227,14 +227,14 @@ TEST(IsUpperTriangular, UpperTriangularAndNonUpperTriangular) {
         {0.0, 3.0},
         {0.0, 0.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(A));
+    EXPECT_TRUE(linalg_lib::IsUpperTriangular(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {1.0, 2.0, 3.0},
         {4.0, 5.0, 6.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsUpperTriangular(A));
+    EXPECT_FALSE(linalg_lib::IsUpperTriangular(A));
   }
 }
 
@@ -246,7 +246,7 @@ TEST(IsHessenberg, HessenbergAndNonHessenberg) {
         {0.0, 9.0, 1.0, 2.0},
         {0.0, 0.0, 3.0, 4.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsHessenberg(A));
+    EXPECT_TRUE(linalg_lib::IsHessenberg(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -255,7 +255,7 @@ TEST(IsHessenberg, HessenbergAndNonHessenberg) {
         {9.0, 1.0, 2.0, 3.0},
         {0.0, 0.0, 3.0, 4.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsHessenberg(A));
+    EXPECT_FALSE(linalg_lib::IsHessenberg(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -263,7 +263,7 @@ TEST(IsHessenberg, HessenbergAndNonHessenberg) {
         {4.0, 5.0, 6.0},
         {0.0, 7.0, 8.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsHessenberg(A));
+    EXPECT_TRUE(linalg_lib::IsHessenberg(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -271,7 +271,7 @@ TEST(IsHessenberg, HessenbergAndNonHessenberg) {
         {3.0, 4.0},
         {0.0, 5.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsHessenberg(A));
+    EXPECT_TRUE(linalg_lib::IsHessenberg(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -279,14 +279,14 @@ TEST(IsHessenberg, HessenbergAndNonHessenberg) {
         {4.0, 5.0, 6.0},
         {7.0, 8.0, 9.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsHessenberg(A));
+    EXPECT_FALSE(linalg_lib::IsHessenberg(A));
   }
 }
 
 TEST(IsSymetric, SymetricAndNonSymetric) {
   {
     linalg_lib::Matrix<double> A = linalg_lib::Matrix<double>::Unit(3);
-    EXPECT_TRUE(linalg_lib::detail::IsSymetric(A));
+    EXPECT_TRUE(linalg_lib::IsSymmetric(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -295,7 +295,7 @@ TEST(IsSymetric, SymetricAndNonSymetric) {
       {3.0, 6.0, 8.0, 9.0},
       {4.0, 7.0, 9.0, 1.0}
     };
-    EXPECT_TRUE(linalg_lib::detail::IsSymetric(A));
+    EXPECT_TRUE(linalg_lib::IsSymmetric(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -303,14 +303,14 @@ TEST(IsSymetric, SymetricAndNonSymetric) {
       {4.0, 5.0, 6.0},
       {7.0, 8.0, 9.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsSymetric(A));
+    EXPECT_FALSE(linalg_lib::IsSymmetric(A));
   }
   {
     linalg_lib::Matrix<double> A = {
       {1.0, 2.0, 3.0},
       {4.0, 5.0, 6.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsSymetric(A));
+    EXPECT_FALSE(linalg_lib::IsSymmetric(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -318,6 +318,6 @@ TEST(IsSymetric, SymetricAndNonSymetric) {
       {3.0, 4.0},
       {5.0, 6.0}
     };
-    EXPECT_FALSE(linalg_lib::detail::IsSymetric(A));
+    EXPECT_FALSE(linalg_lib::IsSymmetric(A));
   }
 }

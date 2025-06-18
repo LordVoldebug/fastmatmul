@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include <functional>
 #include "linalg_lib.h"
+#include "utils/random_matrix.h"
 
 TEST(GivensQRTest, Unit) {
   linalg_lib::Matrix<double> A = {
@@ -12,9 +12,9 @@ TEST(GivensQRTest, Unit) {
   };
 
   auto [Q, R] = GivensQR(A);
-  EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(Q));
+  EXPECT_TRUE(linalg_lib::IsOrthonormal(Q));
   EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * R));
-  EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(R));
+  EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
 }
 
 TEST(HouseholderQR, Unit) {
@@ -26,18 +26,9 @@ TEST(HouseholderQR, Unit) {
   };
 
   auto [Q, R] = HouseholderQR(A);
-  EXPECT_TRUE(linalg_lib::detail::IsOrthonormal(Q));
+  EXPECT_TRUE(linalg_lib::IsOrthonormal(Q));
   EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * R));
-  EXPECT_TRUE(linalg_lib::detail::IsUpperTriangular(R));
-}
-
-
-TEST(GivensQRTest, PRINT) {
-  linalg_lib::Matrix<double> A = {
-    { 4.0,  1.0},
-    { 2.0,  5.0}
-  };
-
+  EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
 }
 
 /*

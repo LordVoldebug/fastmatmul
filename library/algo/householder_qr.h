@@ -4,11 +4,15 @@
 #include "housholder.h"
 
 namespace linalg_lib {
-template <MatrixOrViewType Matrix>
-QRResult<OwnedMatrix<Matrix>> HouseholderQR(const Matrix& matrix) {
-  using OwnedMatrix = OwnedMatrix<Matrix>;
-  OwnedMatrix r_converge{matrix};
-  OwnedMatrix q_suffix = Matrix::Unit(matrix.Rows());
+// В этих алгоритмах наверное уже можно не экономить на спичках поэтому MatrixType и по конст ссылке
+// (по хорошему может и нужно, но это вопрос единиц процентов)
+// а еще мне не очень нравится конечно, что даже в высокоуровневом алгосном коде
+// приходится об этом задумываться
+// но видимо в шаблоны это вынести все таки не получится.
+template <OwnedMatrixType Matrix>
+QRResult<Matrix> HouseholderQR(const Matrix& matrix) {
+  Matrix r_converge{matrix};
+  Matrix q_suffix = Matrix::Unit(matrix.Rows());
   for (Index index = 0; index < r_converge.Cols() && index < r_converge.Rows();
        ++index) {
     auto r_view = r_converge.MutView().SubMatrix(index, 0);

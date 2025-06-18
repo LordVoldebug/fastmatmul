@@ -4,11 +4,10 @@
 #include "givens.h"
 
 namespace linalg_lib {
-template <MatrixOrViewType Matrix>
-QRResult<OwnedMatrix<Matrix>> GivensQR(const Matrix& matrix) {
-  using OwnedMatrix = OwnedMatrix<Matrix>;
-  OwnedMatrix r_converge = matrix;
-  OwnedMatrix q_suffix = OwnedMatrix::Unit(matrix.Rows());
+template <OwnedMatrixType Matrix>
+QRResult<Matrix> GivensQR(const Matrix& matrix) {
+  Matrix r_converge = matrix;
+  Matrix q_suffix = Matrix::Unit(matrix.Rows());
   for (Index col = 0; col < r_converge.Cols(); ++col) {
     for (Index row = col + 1; row < r_converge.Rows(); ++row) {
       auto transformation = detail::GivensRotation(
