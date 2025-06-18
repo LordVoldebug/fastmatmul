@@ -5,6 +5,7 @@
 #include "utils/types.h"
 #include "matrix.h"
 
+
 namespace linalg_lib::detail {
 template <typename MatrixElement>
 struct LinearTransformationEntry {
@@ -17,10 +18,8 @@ template <typename MatrixElement>
 class SparseLinearTransformation {
   using LinearTransformationEntry = LinearTransformationEntry<MatrixElement>;
 
- public:
-  SparseLinearTransformation(Size rows, Size cols)
-      : rows_(rows),
-        cols_(cols) {
+public:
+  SparseLinearTransformation(Size rows, Size cols) : rows_(rows), cols_(cols) {
   }
 
   void AddEntry(Index row, Index col, MatrixElement value) {
@@ -34,8 +33,8 @@ class SparseLinearTransformation {
   // так для пар еще и встроенного хэшера для хэшмапы нет
   // Мне скорее хочется процитировать Рому Липовского
   // https://ibb.co/nMN1tTDH
-  // Или строить заранее? но скорее не хочется логически в детали лезть, что это
-  // именно как список хранится
+  // Или строить заранее? но скорее не хочется логически в детали лезть, что это именно
+  // как список хранится
 
   Size Rows() const {
     return rows_;
@@ -47,7 +46,8 @@ class SparseLinearTransformation {
 
   template <MatrixOrViewType Matrix>
   friend OwnedMatrix<Matrix> operator*(const Matrix& lhs,
-                                       const SparseLinearTransformation& rhs) {
+                                                const SparseLinearTransformation
+                                                & rhs) {
     assert(DimensionMultiplicationMatches(lhs, rhs));
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [rhs_row, rhs_col, rhs_val] : rhs.elements_) {
@@ -57,8 +57,8 @@ class SparseLinearTransformation {
   }
 
   template <MatrixOrViewType Matrix>
-  friend OwnedMatrix<Matrix> operator*(const SparseLinearTransformation& lhs,
-                                       const Matrix& rhs) {
+  friend OwnedMatrix<Matrix> operator*(
+      const SparseLinearTransformation& lhs, const Matrix& rhs) {
     assert(DimensionMultiplicationMatches(lhs, rhs));
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [lhs_row, lhs_col, lhs_val] : lhs.elements_) {
@@ -67,9 +67,9 @@ class SparseLinearTransformation {
     return res;
   }
 
- private:
+private:
   std::vector<LinearTransformationEntry> elements_;
   Size rows_;
   Size cols_;
 };
-}  // namespace linalg_lib::detail
+} // namespace linalg_lib::detail

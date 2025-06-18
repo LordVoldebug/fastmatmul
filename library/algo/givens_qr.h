@@ -22,4 +22,4 @@ QRResult<Matrix> GivensQR(const Matrix& matrix) {
   }
   return {Transposed(q_suffix), r_converge};
 }
-}  // namespace linalg_lib
+} // namespace linalg_lib

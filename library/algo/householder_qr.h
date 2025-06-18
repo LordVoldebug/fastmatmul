@@ -4,11 +4,11 @@
 #include "housholder.h"
 
 namespace linalg_lib {
-// В этих алгоритмах наверное уже можно не экономить на спичках поэтому
-// MatrixType и по конст ссылке (по хорошему может и нужно, но это вопрос единиц
-// процентов) а еще мне не очень нравится конечно, что даже в высокоуровневом
-// алгосном коде приходится об этом задумываться но видимо в шаблоны это вынести
-// все таки не получится.
+// В этих алгоритмах наверное уже можно не экономить на спичках поэтому MatrixType и по конст ссылке
+// (по хорошему может и нужно, но это вопрос единиц процентов)
+// а еще мне не очень нравится конечно, что даже в высокоуровневом алгосном коде
+// приходится об этом задумываться
+// но видимо в шаблоны это вынести все таки не получится.
 template <OwnedMatrixType Matrix>
 QRResult<Matrix> HouseholderQR(const Matrix& matrix) {
   Matrix r_converge{matrix};
@@ -18,12 +18,12 @@ QRResult<Matrix> HouseholderQR(const Matrix& matrix) {
     auto r_view = r_converge.MutView().SubMatrix(index, 0);
     auto q_view = q_suffix.MutView().SubMatrix(index, 0);
 
-    auto transformation =
-        detail::HouseholderReflection(Matrix{r_view.Col(index)});
+    auto transformation = detail::HouseholderReflection(
+        Matrix{r_view.Col(index)});
 
     transformation.ApplyLeft(r_view);
     transformation.ApplyLeft(q_view);
   }
   return {Transposed(q_suffix), r_converge};
 }
-}  // namespace linalg_lib
+} // namespace linalg_lib

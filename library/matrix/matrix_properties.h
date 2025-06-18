@@ -13,8 +13,7 @@ bool DimensionMatches(const LMatrix& lhs, const RMatrix& rhs) {
 // а полноценно их в общую логику выделить ну можно но только сюда что ли?..
 // и я сходу не придумал как такое должно называться
 // тем более SparseLinearTransformation достаточно сервисный объект, у него нет
-// полноценной семантики разреженной матрицы... даже если и стоит, то короче
-// потом
+// полноценной семантики разреженной матрицы... даже если и стоит, то короче потом
 template <typename LMatrix, typename RMatrix>
 bool DimensionMultiplicationMatches(const LMatrix& lhs, const RMatrix& rhs) {
   return lhs.Cols() == rhs.Rows();
@@ -34,6 +33,7 @@ template <MatrixOrViewType Matrix>
 bool IsOrthonormal(const Matrix& matrix) {
   return IsUnit(Transposed(matrix) * matrix);
 }
+
 
 template <MatrixOrViewType Matrix>
 bool IsDiagonal(const Matrix& matrix) {
@@ -97,4 +97,4 @@ bool IsSymmetric(const Matrix& matrix) {
   }
   return true;
 }
-}  // namespace linalg_lib
+} // namespace linalg_lib::detail
