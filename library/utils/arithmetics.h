@@ -4,6 +4,7 @@
 
 namespace linalg_lib {
 constexpr long double kEps = 1e-9;
+constexpr IterCount kDefaultIterations = 1000;
 
 template <Numeric MatrixElement>
 bool IsEpsilonEqual(MatrixElement lhs, MatrixElement rhs) {

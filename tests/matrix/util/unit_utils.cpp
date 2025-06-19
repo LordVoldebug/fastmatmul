@@ -18,14 +18,14 @@ TEST(IsEpsilonEqual, NearEqualAndNotEqual) {
 TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
   {
     auto A = linalg_lib::Matrix<double>::Unit(3);
-    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthogonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {0, 1},
         {1, 0},
     };
-    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthogonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -33,7 +33,7 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
         {0, 1, 0},
         {0, 0, 1},
     };
-    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthogonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -41,14 +41,14 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
         {1, 0, 0},
         {0, 1, 0},
     };
-    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthogonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {1, 2},
         {3, 4},
     };
-    EXPECT_FALSE(linalg_lib::IsOrthonormal(A));
+    EXPECT_FALSE(linalg_lib::IsOrthogonal(A));
   }
   {
     double value = 1.0 / 3.0;
@@ -57,15 +57,15 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
         {-2 * value, 1 - 2 * value, -2 * value},
         {-2 * value, -2 * value, 1 - 2 * value},
     };
-    EXPECT_TRUE(linalg_lib::IsOrthonormal(B));
+    EXPECT_TRUE(linalg_lib::IsOrthogonal(B));
   }
   {
     linalg_lib::Matrix<double> A = {{0.0}, {1.0}, {0.0}};
-    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthogonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {{1.0, 0.0, 0.0}};
-    EXPECT_FALSE(linalg_lib::IsOrthonormal(A));
+    EXPECT_FALSE(linalg_lib::IsOrthogonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
@@ -74,14 +74,14 @@ TEST(IsOrthonormal, OrthonormalAndNonOrthonormal) {
         {0.0, 0.0},
         {0.0, 0.0},
     };
-    EXPECT_TRUE(linalg_lib::IsOrthonormal(A));
+    EXPECT_TRUE(linalg_lib::IsOrthogonal(A));
   }
   {
     linalg_lib::Matrix<double> A = {
         {0.6, 0.8, 0.0},
         {0.8, -0.6, 1.0},
     };
-    EXPECT_FALSE(linalg_lib::IsOrthonormal(A));
+    EXPECT_FALSE(linalg_lib::IsOrthogonal(A));
   }
 }
 

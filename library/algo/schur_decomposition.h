@@ -5,21 +5,36 @@
 #include "utils/arithmetics.h"
 
 namespace linalg_lib {
+
 template <MatrixType Matrix>
-QRResult<Matrix> SchurSimpleQR(const Matrix& matrix) {
-  Matrix r_converge = matrix;
-  Matrix q_suffix = Matrix::Unit(matrix.Rows());
-  for (Index col = 0; col < r_converge.Cols(); ++col) {
-    for (Index row = col + 1; row < r_converge.Rows(); ++row) {
-      if (IsEpsilonEqualZero(r_converge(row, col))) {
-        continue;
-      }
-      auto transformation = detail::GivensRotation(
-          col, row, r_converge(col, col), r_converge(row, col));
-      transformation.ApplyLeft(r_converge);
-      transformation.ApplyLeft(q_suffix);
+QRResult<Matrix> SchurSimpleQR(const Matrix& matrix, IterCount max_iterations = kDefaultIterations) {
+  assert(IsSquare(matrix) && "Schur Decomposition is for square matrices");
+  auto [q_prefix, r_converge] = HessenbergDecomposition(matrix);
+  for (IterCount iter = 0; iter < max_iterations && !IsUpperTriangular(matrix); ++iter) {
+    auto [q_qr, r_qr] = GivensQR(r_converge); // O(n^2)
+    // т. к. O(n) элементов под главной диагональю, и новые не появляются
+    r_converge = r_qr * q_qr;
+    q_prefix *= q_qr;
+  }
+  return {q_prefix, r_converge};
+}
+
+template <MatrixType Matrix>
+QRResult<Matrix> SchurRayleighQR(const Matrix& matrix, IterCount max_iterations = kDefaultIterations) {
+  assert(IsSquare(matrix) && "Schur Decomposition is for square matrices");
+  auto [q_prefix, r_converge] = HessenbergDecomposition(matrix);
+  for (Size prefix = matrix.Rows(); prefix > 1; --prefix) {
+    while (!IsEpsilonEqualZero(q_prefix(prefix - 1, prefix - 1))) {
+      auto q_prefix_view = q_prefix.MutView().SubMatrix(Index{0}, Index{0}, prefix, prefix);
+      auto r_converge_view = r_converge.MutView().SubMatrix(Index{0}, Index{0}, prefix, prefix);
+
+      auto shift = r_converge_view(prefix - 1, prefix - 1);;
+      auto [q_qr, r_qr] = GivensQR(r_converge_view - shift * Matrix::Unit(matrix.Rows())); // O(n^2)
+      // т. к. O(n) элементов под главной диагональю, и новые не появляются
+      r_converge_view.Store(r_qr * q_qr);
+      q_prefix_view *= q_qr;
     }
   }
-  return {Transposed(q_suffix), r_converge};
+  return {q_prefix, r_converge};
 }
 }  // namespace linalg_lib

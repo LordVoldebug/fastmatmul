@@ -31,7 +31,7 @@ bool IsUnit(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsOrthonormal(const Matrix& matrix) {
+bool IsOrthogonal(const Matrix& matrix) {
   return IsUnit(Transposed(matrix) * matrix);
 }
 

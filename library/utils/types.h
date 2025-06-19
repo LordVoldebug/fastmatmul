@@ -4,6 +4,7 @@
 namespace linalg_lib {
 using Index = int64_t;
 using Size = int64_t;
+using IterCount = int64_t;
 
 template <typename T>
 concept Numeric = std::integral<T> || std::floating_point<T>;
@@ -91,8 +92,8 @@ struct HessenbergResult {
 
 template <OwnedMatrixType Matrix>
 struct SchurResult {
-  Matrix U;
-  Matrix T;
+  Matrix Q;
+  Matrix R;
 };
 
 template <OwnedMatrixType Matrix>

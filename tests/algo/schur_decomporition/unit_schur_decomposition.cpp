@@ -2,16 +2,35 @@
 #include <iostream>
 #include "linalg_lib.h"
 
-TEST(SchurDecomposition, Unit) {
+TEST(SchurDecompositionSimple, Unit) {
   linalg_lib::Matrix<double> A = {
-      {4.0, 1.0, 3.0, 2.0},
-      {2.0, 5.0, 2.0, 1.0},
-      {6.0, 0.0, 7.0, 3.0},
-      {1.0, 2.0, 0.0, 8.0},
+    {2.0, 3.0, 2.0, 2.0, 2.0, 3.0},
+    {3.0, 4.0, 3.0, 2.0, 2.0, 2.0},
+    {2.0, 3.0, 5.0, 3.0, 2.0, 2.0},
+    {2.0, 2.0, 3.0, 6.0, 3.0, 2.0},
+    {2.0, 2.0, 2.0, 3.0, 7.0, 3.0},
+    {3.0, 2.0, 2.0, 2.0, 3.0, 8.0},
   };
-
-  auto [Q, R] = GivensQR(A);
-  EXPECT_TRUE(linalg_lib::IsOrthonormal(Q));
-  EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * R));
+  auto [Q, R] = SchurSimpleQR(A);
+  EXPECT_TRUE(IsEpsilonEqual(Q * R * Transposed(Q), A));
+  EXPECT_TRUE(linalg_lib::IsOrthogonal(Q));
   EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
+  // Но легко найти матрицу, где вообще не сойдется
+}
+
+TEST(SchurDecompositionRayleigh, Unit) {
+  // Пока не работает
+  linalg_lib::Matrix<double> A = {
+    {2.0, 3.0, 2.0, 2.0, 2.0, 3.0},
+    {3.0, 4.0, 3.0, 2.0, 2.0, 2.0},
+    {2.0, 3.0, 5.0, 3.0, 2.0, 2.0},
+    {2.0, 2.0, 3.0, 6.0, 3.0, 2.0},
+    {2.0, 2.0, 2.0, 3.0, 7.0, 3.0},
+    {3.0, 2.0, 2.0, 2.0, 3.0, 8.0},
+};
+
+
+  // auto [Q, R] = SchurRayleighQR(A);
+  // std::cout << Q * R * Transposed(Q) << std::endl;
+  // std::cout << R << std::endl;
 }

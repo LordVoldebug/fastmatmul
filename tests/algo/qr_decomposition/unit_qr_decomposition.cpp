@@ -11,7 +11,7 @@ TEST(GivensQR, Unit) {
   };
 
   auto [Q, R] = GivensQR(A);
-  EXPECT_TRUE(linalg_lib::IsOrthonormal(Q));
+  EXPECT_TRUE(linalg_lib::IsOrthogonal(Q));
   EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * R));
   EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
 }
@@ -25,7 +25,7 @@ TEST(HouseholderQR, Unit) {
   };
 
   auto [Q, R] = HouseholderQR(A);
-  EXPECT_TRUE(linalg_lib::IsOrthonormal(Q));
+  EXPECT_TRUE(linalg_lib::IsOrthogonal(Q));
   EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * R));
   EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
 }
