@@ -28,20 +28,24 @@ class MatrixView {
         cols_(cols) {
     // На этом моменте начинаешь задумываться про Strong Type Aliassing....
     // Но чот мне кажется будет неудобно очень...
-    assert(rows_ >= 0);
-    assert(cols_ >= 0);
-    assert(0 <= start_row_ && start_row_ <= matrix_.get().Rows());
-    assert(0 <= start_col_ && start_col_ <= matrix_.get().Cols());
+    assert(rows_ >= 0 && "MatrixView row count need to be non negative");
+    assert(cols_ >= 0 && "MatrixView column count need to be non negative");
+    assert(0 <= start_row_ && start_row_ <= matrix_.get().Rows() &&
+           "MatrixView start row out of bounds");
+    assert(0 <= start_col_ && start_col_ <= matrix_.get().Cols() &&
+           "MatrixView start column out of bounds");
     assert(0 <= start_row_ + rows_ &&
-           start_row_ + rows_ <= matrix_.get().Rows());
+           start_row_ + rows_ <= matrix_.get().Rows() &&
+           "MatrixView end row out of bounds");
     assert(0 <= start_col_ + cols_ &&
-           start_col_ + cols_ <= matrix_.get().Cols());
+           start_col_ + cols_ <= matrix_.get().Cols() &&
+           "MatrixView end column out of bounds");
   }
 
  public:
   decltype(auto) operator()(this auto&& self, Index row, Index col) {
-    assert(0 <= row && row < self.Rows());
-    assert(0 <= col && col < self.Cols());
+    assert(0 <= row && row < self.Rows() && "Matrix indices out of bounds");
+    assert(0 <= col && col < self.Cols() && "Matrix indices out of bounds");
 
     return self.matrix_.get()(row + self.start_row_, col + self.start_col_);
   }
@@ -57,19 +61,25 @@ class MatrixView {
   }
 
   MatrixView SubMatrix(Index start_row, Index start_col) {
-    assert(0 <= start_row && start_row <= Rows());
-    assert(0 <= start_col && start_col <= Cols());
+    assert(0 <= start_row && start_row <= Rows() &&
+           "SubMatrix start row out of bounds");
+    assert(0 <= start_col && start_col <= Cols() &&
+           "SubMatrix start column out of bounds");
     return SubMatrix(start_row, start_col, Rows() - start_row,
                      Cols() - start_col);
   }
 
   MatrixView SubMatrix(Index start_row, Index start_col, Size rows, Size cols) {
-    assert(rows >= 0);
-    assert(cols >= 0);
-    assert(0 <= start_row && start_row <= Rows());
-    assert(0 <= start_col && start_col <= Cols());
-    assert(0 <= start_row + rows && start_row + rows <= Rows());
-    assert(0 <= start_col + cols && start_col + cols <= Cols());
+    assert(rows >= 0 && "SubMatrix row count need to be non negative");
+    assert(cols >= 0 && "SubMatrix column count need to be non negative");
+    assert(0 <= start_row && start_row <= Rows() &&
+           "SubMatrix start row out of bounds");
+    assert(0 <= start_col && start_col <= Cols() &&
+           "SubMatrix start column out of bounds");
+    assert(0 <= start_row + rows && start_row + rows <= Rows() &&
+           "SubMatrix end row out of bounds");
+    assert(0 <= start_col + cols && start_col + cols <= Cols() &&
+           "SubMatrix end column out of bounds");
     // Мне не нравятся эти цепочки ассертов, но как их вынести сохранив
     // читаемость я не придумал (условно, LiesWithin внешней функцией
     // имхо менее читаемо (какой параметр есть кто?)
@@ -78,13 +88,13 @@ class MatrixView {
   }
 
   MatrixView Row(Index row) {
-    assert(0 <= row && row < Rows());
+    assert(0 <= row && row < Rows() && "Matrix row index out of bounds");
     return MatrixView(matrix_.get(), start_row_ + row, start_col_, Size{1},
                       Cols());
   }
 
   MatrixView Col(Index col) {
-    assert(0 <= col && col < Cols());
+    assert(0 <= col && col < Cols() && "Matrix column index out of bounds");
     return MatrixView(matrix_.get(), start_row_, start_col_ + col, Rows(),
                       Size{1});
   }

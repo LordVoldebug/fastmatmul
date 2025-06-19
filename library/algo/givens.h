@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include "matrix/matrix.h"
 #include "utils/arithmetics.h"
 #include "utils/types.h"
@@ -20,6 +21,10 @@ class GivensRotation {
         pos1_(pos1),
         a0_(a0),
         a1_(a1) {
+    assert(pos0 >= 0 && "Givens rotation position needs be non-negative");
+    assert(pos1 >= 0 && "Givens rotation position needs be non-negative");
+    assert(pos0 != pos1 && "Givens rotation positions can not be equal");
+
     if (IsEpsilonEqual(a1_, MatrixElement{0})) {
       a0_ = MatrixElement{1};
       a1_ = MatrixElement{1};
@@ -32,6 +37,11 @@ class GivensRotation {
 
   template <MatrixOrViewType MatrixType>
   void ApplyLeft(MatrixType&& matrix) {
+    assert(pos0_ < matrix.Rows() &&
+           "Givens rotation position is out of bound for matrix");
+    assert(pos1_ < matrix.Rows() &&
+           "Givens rotation position is out of bound for matrix");
+
     for (Index col = 0; col < matrix.Cols(); ++col) {
       MatrixElement val0 = matrix(pos0_, col);
       MatrixElement val1 = matrix(pos1_, col);
@@ -52,6 +62,11 @@ class GivensRotation {
 
   template <MatrixOrViewType MatrixType>
   void ApplyRight(MatrixType&& matrix) {
+    assert(pos0_ < matrix.Cols() &&
+           "Givens rotation position is out of bound for matrix");
+    assert(pos1_ < matrix.Cols() &&
+           "Givens rotation position is out of bound for matrix");
+
     for (Index row = 0; row < matrix.Cols(); ++row) {
       MatrixElement val0 = matrix(row, pos0_);
       MatrixElement val1 = matrix(row, pos1_);

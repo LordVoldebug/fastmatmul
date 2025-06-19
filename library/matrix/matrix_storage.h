@@ -23,9 +23,9 @@ class MatrixEntryIterator {
   }
 
   reference operator*() const {
-    assert(cols_ != 0);
-    assert(cur_idx_ >= 0);
-    assert(cur_idx_ / cols_ < rows_);
+    assert(cols_ != 0 && "MatrixEntryIterator out of bounds");
+    assert(cur_idx_ >= 0 && "MatrixEntryIterator out of bounds");
+    assert(cur_idx_ / cols_ < rows_ && "MatrixEntryIterator out of bounds");
     return {cur_idx_ / cols_, cur_idx_ % cols_};
   }
 
@@ -71,13 +71,12 @@ class MatrixStorage {
       : rows_(rows),
         cols_(cols),
         data_(rows * cols) {
-    assert(rows >= 0);
-    assert(cols >= 0);
+    assert(rows >= 0 && "MatrixStorage row count needs to be non-negative");
+    assert(cols >= 0 && "MatrixStorage column count needs to be non-negative");
   }
 
   auto&& operator()(this auto&& self, Index row, Index col) noexcept {
-    assert(0 <= row && row < self.Rows());
-    assert(0 <= col && col < self.Cols());
+    assert(self.InMatrix(row, col) && "MatrixStorage indices out of bounds");
 
     Index position = row * self.Cols() + col;
     return self.data_[position];
@@ -93,6 +92,10 @@ class MatrixStorage {
 
   MatrixRangeImpl MatrixRange() const {
     return MatrixRangeImpl(rows_, cols_);
+  }
+
+  bool InMatrix(Index row, Index col) const {
+    return 0 <= row && row < Rows() && 0 <= col && col < Cols();
   }
 
  private:

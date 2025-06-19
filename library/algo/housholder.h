@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include "matrix/matrix.h"
 #include "utils/arithmetics.h"
 #include "utils/types.h"
@@ -6,30 +7,38 @@
 namespace linalg_lib::detail {
 
 template <MatrixOrViewType MatrixType>
-MatrixElementType<MatrixType> Norm(const MatrixType& vector) {
-  assert(vector.Cols() == 1);
+MatrixElementType<MatrixType> VectorNorm(const MatrixType& vector) {
+  assert(vector.Cols() == 1 && "VectorNorm vector needs to be a vector");
   return std::sqrt((Transposed(vector) * vector)(0, 0));
 }
 
 template <OwnedMatrixType Matrix>
 class HouseholderReflection {
  public:
-  explicit HouseholderReflection(const Matrix& to_zero_vec)
-      : householder_vector_(to_zero_vec) {
-    assert(householder_vector_.Cols() == 1);
+  template <MatrixOrViewType ToZeroVecType>
+  explicit HouseholderReflection(ToZeroVecType&& to_zero_vec)
+      : householder_vector_(std::forward<ToZeroVecType>(to_zero_vec)) {
+    assert(householder_vector_.Cols() == 1 &&
+           "Householder vector needs to be a vector");
     householder_vector_(0, 0) +=
-        Norm(householder_vector_) * Sign(householder_vector_(0, 0));
-    householder_vector_ /= Norm(householder_vector_);
+        VectorNorm(householder_vector_) * Sign(householder_vector_(0, 0));
+    householder_vector_ /= VectorNorm(householder_vector_);
   }
 
   template <MutableMatrixOrViewType MatrixType>
   void ApplyLeft(MatrixType&& matrix) {
+    assert(householder_vector_.Rows() == matrix.Rows() &&
+           "Householder reflection dimension does not match with matrix "
+           "dimension");
     matrix -=
         householder_vector_ * 2 * (Transposed(householder_vector_) * matrix);
   }
 
   template <MutableMatrixOrViewType MatrixType>
   void ApplyRight(MatrixType&& matrix) {
+    assert(matrix.Cols() == householder_vector_.Rows() &&
+           "Householder reflection dimension does not match with matrix "
+           "dimension");
     matrix -=
         matrix * householder_vector_ * 2 * Transposed(householder_vector_);
   }

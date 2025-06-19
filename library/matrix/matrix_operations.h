@@ -21,6 +21,7 @@ void Apply(Matrix&& matrix,
 // в какой-нибудь именованный концепт или что нибудь такое но кажется так нельзя
 template <MutableMatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
+  // Такие assert-ы кажется self-explanotary и в них && не обязателен?
   assert(DimensionMatches(lhs, rhs));
   for (auto [row, col] : lhs.MatrixRange()) {
     lhs(row, col) += rhs(row, col);

@@ -21,11 +21,18 @@ class SparseLinearTransformation {
   SparseLinearTransformation(Size rows, Size cols)
       : rows_(rows),
         cols_(cols) {
+    assert(rows >= 0 &&
+           "Sparse linear transformation row count needs to be non-negative");
+    assert(
+        cols >= 0 &&
+        "Sparse linear transformation column count needs to be non-negative");
   }
 
   void AddEntry(Index row, Index col, MatrixElement value) {
-    assert(0 <= row && row < Rows());
-    assert(0 <= col && col < Cols());
+    assert(0 <= row && row < Rows() &&
+           "Sparse linear transformation indices out of bounds");
+    assert(0 <= col && col < Cols() &&
+           "Sparse linear transformation indices out of bounds");
     elements_.push_back({row, col, value});
   }
 
@@ -41,7 +48,8 @@ class SparseLinearTransformation {
   friend OwnedMatrix<Matrix> operator*(const Matrix& lhs,
                                        const SparseLinearTransformation& rhs) {
     assert(DimensionMultiplicationMatches(lhs, rhs));
-    assert(rhs.AreElementsUnique());
+    assert(rhs.AreElementsUnique() &&
+           "Positions in SparseLinearTransformation need to be unique");
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [matrix_entry, rhs_val] : rhs.elements_) {
       auto [rhs_row, rhs_col] = matrix_entry;
@@ -53,8 +61,11 @@ class SparseLinearTransformation {
   template <MatrixOrViewType Matrix>
   friend OwnedMatrix<Matrix> operator*(const SparseLinearTransformation& lhs,
                                        const Matrix& rhs) {
-    assert(DimensionMultiplicationMatches(lhs, rhs));
-    assert(lhs.AreElementsUnique());
+    assert(DimensionMultiplicationMatches(lhs, rhs) &&
+           "Dimensions for SparseLinearTransformation multiplication do not "
+           "match");
+    assert(lhs.AreElementsUnique() &&
+           "Positions in SparseLinearTransformation need to be unique");
     OwnedMatrix<Matrix> res(lhs.Rows(), rhs.Cols());
     for (auto [matrix_entry, lhs_val] : lhs.elements_) {
       auto [lhs_row, lhs_col] = matrix_entry;
@@ -64,7 +75,6 @@ class SparseLinearTransformation {
   }
 
  private:
-
   bool AreElementsUnique() const {
     auto comparator = [](const MatrixEntry& a, const MatrixEntry& b) {
       return std::tie(a.row, a.col) < std::tie(b.row, b.col);

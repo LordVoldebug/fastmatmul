@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include "matrix_storage.h"
 #include "utils/types.h"
 #include "matrix_properties.h"
@@ -15,10 +16,13 @@ class Matrix {
 
   Matrix(Size rows, Size cols)
       : storage_(rows, cols) {
+    assert(rows >= 0 && "Matrix row count needs to be non-negative");
+    assert(cols >= 0 && "Matrix column count needs to be non-negative");
   }
 
   explicit Matrix(Size rows)
       : storage_(rows, rows) {
+    assert(rows >= 0 && "Matrix row count needs to be non-negative");
   }
 
   template <MatrixViewType ViewType>
@@ -40,18 +44,21 @@ class Matrix {
   }
 
   Matrix(std::initializer_list<std::initializer_list<MatrixElement>> data)
-      : storage_(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
+      : Matrix(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
     for (Index row = 0; row < storage_.Rows(); ++row) {
-      assert(data.begin()[row].size() == storage_.Cols());
+      assert(data.begin()[row].size() == storage_.Cols() &&
+             "Initializer row sizes need to match");
       for (Index col = 0; col < storage_.Cols(); ++col) {
-        storage_(row, col) = data.begin()[row].begin()[col];
+        (*this)(row, col) = data.begin()[row].begin()[col];
       }
     }
     // тут не через MatrixRange чтобы assert аккуратно вставить
   }
 
   decltype(auto) operator()(this auto&& self, Index row, Index col) {
-    assert(self.InMatrix(row, col));
+    assert(self.InMatrix(row, col) && "Matrix indices out of bounds");
+    // меня смущает немного этот ассерт
+    // но по идее если падает матрица то не хочется проваливаться в стораж?
     return self.storage_(row, col);
   }
 
@@ -84,7 +91,7 @@ class Matrix {
   }
 
   bool InMatrix(Index row, Index col) const {
-    return 0 <= row && row < Rows() && 0 <= col && col < Cols();
+    return storage_.InMatrix(row, col);
   }
 
  private:

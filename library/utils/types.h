@@ -84,9 +84,29 @@ struct QRResult {
 };
 
 template <OwnedMatrixType Matrix>
+struct HessenbergResult {
+  Matrix Q;
+  Matrix H;
+};
+
+template <OwnedMatrixType Matrix>
+struct SchurResult {
+  Matrix U;
+  Matrix T;
+};
+
+template <OwnedMatrixType Matrix>
+struct BidiagonalizationResult {
+  Matrix U;
+  Matrix B;
+  Matrix V;
+};
+
+template <OwnedMatrixType Matrix>
 struct SVDResult {
   Matrix U;
   Matrix Sigma;
   Matrix V;
 };
+
 }  // namespace linalg_lib
