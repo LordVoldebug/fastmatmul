@@ -24,14 +24,14 @@ QRResult<Matrix> SchurRayleighQR(const Matrix& matrix, IterCount max_iterations 
   assert(IsSquare(matrix) && "Schur Decomposition is for square matrices");
   auto [q_prefix, r_converge] = HessenbergDecomposition(matrix);
   for (Size prefix = matrix.Rows(); prefix > 1; --prefix) {
-    while (!IsEpsilonEqualZero(q_prefix(prefix - 1, prefix - 1))) {
+    while (!IsEpsilonEqualZero(r_converge(prefix - 1, prefix - 2))) {
       auto q_prefix_view = q_prefix.MutView().SubMatrix(Index{0}, Index{0}, prefix, prefix);
       auto r_converge_view = r_converge.MutView().SubMatrix(Index{0}, Index{0}, prefix, prefix);
 
       auto shift = r_converge_view(prefix - 1, prefix - 1);;
-      auto [q_qr, r_qr] = GivensQR(r_converge_view - shift * Matrix::Unit(matrix.Rows())); // O(n^2)
+      auto [q_qr, r_qr] = GivensQR(r_converge_view - shift * Matrix::Unit(prefix)); // O(n^2)
       // т. к. O(n) элементов под главной диагональю, и новые не появляются
-      r_converge_view.Store(r_qr * q_qr);
+      r_converge_view.Store(r_qr * q_qr + Matrix::Unit(prefix) * shift);
       q_prefix_view *= q_qr;
     }
   }

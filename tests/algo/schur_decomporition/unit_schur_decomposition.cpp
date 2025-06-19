@@ -19,18 +19,18 @@ TEST(SchurDecompositionSimple, Unit) {
 }
 
 TEST(SchurDecompositionRayleigh, Unit) {
-  // Пока не работает
+  // На этой матрице без сдвигов не сходится
   linalg_lib::Matrix<double> A = {
     {2.0, 3.0, 2.0, 2.0, 2.0, 3.0},
-    {3.0, 4.0, 3.0, 2.0, 2.0, 2.0},
-    {2.0, 3.0, 5.0, 3.0, 2.0, 2.0},
-    {2.0, 2.0, 3.0, 6.0, 3.0, 2.0},
-    {2.0, 2.0, 2.0, 3.0, 7.0, 3.0},
-    {3.0, 2.0, 2.0, 2.0, 3.0, 8.0},
-};
+    {3.0, 2.0, 3.0, 2.0, 2.0, 2.0},
+    {2.0, 3.0, 2.0, 3.0, 2.0, 2.0},
+    {2.0, 2.0, 3.0, 2.0, 3.0, 2.0},
+    {2.0, 2.0, 2.0, 3.0, 2.0, 3.0},
+    {3.0, 2.0, 2.0, 2.0, 3.0, 2.0},
+  };
 
-
-  // auto [Q, R] = SchurRayleighQR(A);
-  // std::cout << Q * R * Transposed(Q) << std::endl;
-  // std::cout << R << std::endl;
+  auto [Q, R] = SchurRayleighQR(A);
+  EXPECT_TRUE(IsEpsilonEqual(Q * R * Transposed(Q), A));
+  EXPECT_TRUE(linalg_lib::IsOrthogonal(Q));
+  EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
 }
