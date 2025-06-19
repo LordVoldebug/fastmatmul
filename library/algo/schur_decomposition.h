@@ -1,7 +1,7 @@
 #pragma once
 #include "matrix/matrix.h"
 #include "utils/types.h"
-#include "givens.h"
+#include "givens_qr.h"
 #include "utils/arithmetics.h"
 
 namespace linalg_lib {
