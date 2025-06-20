@@ -10,7 +10,6 @@ TEST_F(RandomDoubleMatrix, SchurDecompositionRayleigh) {
     constexpr int64_t kMatrixSize = 5;
 
     auto A = generator.GenerateSquareSymmetric(kMatrixSize);
-    // для неквадратных сходится плохо
 
     auto [Q, R] = SchurRayleighQR(A);
     EXPECT_TRUE(IsEpsilonEqual(Q * R * Transposed(Q), A));
@@ -26,7 +25,6 @@ TEST_F(RandomDoubleMatrix, SchurDecompositionWilkinson) {
     constexpr int64_t kMatrixSize = 5;
 
     auto A = generator.GenerateSquareSymmetric(kMatrixSize);
-    // для неквадратных сходится плохо
 
     auto [Q, R] = linalg_lib::SchurWilkinsonQR(A);
     EXPECT_TRUE(IsEpsilonEqual(Q * R * Transposed(Q), A));

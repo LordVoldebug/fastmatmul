@@ -25,9 +25,18 @@ class HouseholderReflection {
     householder_vector_ /= VectorNorm(householder_vector_);
   }
 
+  Size Rows() const {
+    return householder_vector_.Rows();
+  }
+
+  Size Cols() const { // для частичной семантики линейного преоброзавания
+    // чтобы assert DimensionMultiplicationMatches писать, а то думать надо
+    return householder_vector_.Rows();
+  }
+
   template <MutableMatrixOrViewType MatrixType>
   void ApplyLeft(MatrixType&& matrix) {
-    assert(householder_vector_.Rows() == matrix.Rows() &&
+    assert(DimensionMultiplicationMatches(*this, matrix) &&
            "Householder reflection dimension does not match with matrix "
            "dimension");
     matrix -=
@@ -36,7 +45,7 @@ class HouseholderReflection {
 
   template <MutableMatrixOrViewType MatrixType>
   void ApplyRight(MatrixType&& matrix) {
-    assert(matrix.Cols() == householder_vector_.Rows() &&
+    assert(DimensionMultiplicationMatches(matrix, *this) &&
            "Householder reflection dimension does not match with matrix "
            "dimension");
     matrix -=
