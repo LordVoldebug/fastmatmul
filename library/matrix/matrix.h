@@ -31,23 +31,13 @@ class Matrix {
     for (auto [row, col] : MatrixRange()) {
       (*this)(row, col) = view(row, col);
     }
-    // Общая архитектурная ремарка: я думал о том чтобы сделать итераторы
-    // в фиксированном порядке, и делать ranges::transform/ranges::zip
-    // но мне показалось, что так лучше (потому что опять таки у матриц
-    // потенциально может быть разный layout
-
-    // Я думал что что может стоит сделать Apply который принимает лямбду с row
-    // и col и ссылкой на объект но я подумал что уже с MatrixRange() достаточно
-    // читаемо и более локально (передаем лямбду, которая еще зависит от
-    // параметров еще бы не запутаться где col-row где элемент, короче может не
-    // надо...) В общем, считаю что лучше через итератор по самим элементам явно
   }
 
   Matrix(std::initializer_list<std::initializer_list<MatrixElement>> data)
-      : Matrix(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
+    : Matrix(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
     for (Index row = 0; row < storage_.Rows(); ++row) {
       assert(data.begin()[row].size() == storage_.Cols() &&
-             "Initializer row sizes need to match");
+          "Initializer row sizes need to match");
       for (Index col = 0; col < storage_.Cols(); ++col) {
         (*this)(row, col) = data.begin()[row].begin()[col];
       }
