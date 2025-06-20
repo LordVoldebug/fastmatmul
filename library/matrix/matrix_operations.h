@@ -39,11 +39,6 @@ LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
   return lhs;
 }
 
-// а тут universal кажется не обязателен (вроде буквально единичные мувы
-// экономит) по крайней мере мне не приходит в голову сценария, когда будет
-// тормозить но копировать явно все равно придется, чтобы с вьюшками логика
-// работала так что пусть уже будет, раз хоть что то экономит, да и так у нас
-// полно этих universal references, пусть уж живут для единообразия
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
