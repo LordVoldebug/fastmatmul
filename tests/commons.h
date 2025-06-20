@@ -2,9 +2,9 @@
 #include <random>
 #include "utils/random_matrix.h"
 
-class RandomSmallIntegerMatrix : public testing::Test {
+class RandomDoubleMatrix : public testing::Test {
  protected:
-  linalg_lib::detail::RandomMatrixGenerator<int,
-                                            std::uniform_int_distribution<>>
-      generator{std::uniform_int_distribution<>(0, 3)};
+  linalg_lib::detail::RandomMatrixGenerator<double,
+                                            std::uniform_real_distribution<>>
+      generator{std::uniform_real_distribution<double>(0.0, 1000.0)};
 };

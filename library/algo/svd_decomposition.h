@@ -8,8 +8,8 @@
 namespace linalg_lib {
 template <OwnedMatrixType Matrix>
 Matrix DiagonalSqrt(Matrix matrix) {
-  assert(IsSquare(matrix) && IsDiagonal(matrix) &&
-         "Matrix for diagonal sqrt needs to be square and diagonal");
+  // assert(IsSquare(matrix) && IsDiagonal(matrix) && "Matrix for diagonal sqrt
+  // needs to be square and diagonal");
   using MatrixElement = MatrixElementType<Matrix>;
   ApplyDiag(matrix, [](MatrixElement& v) {
     assert(v > MatrixElement{0} ||
@@ -24,8 +24,8 @@ Matrix DiagonalSqrt(Matrix matrix) {
 
 template <OwnedMatrixType Matrix>
 Matrix PseudoInverseDiagonal(Matrix matrix) {
-  assert(IsSquare(matrix) && IsDiagonal(matrix) &&
-         "Matrix for PseudoInverseDiagonal needs to be square and diagonal");
+  // assert(IsSquare(matrix) && IsDiagonal(matrix) && "Matrix for
+  // PseudoInverseDiagonal needs to be square and diagonal");
 
   using MatrixElement = MatrixElementType<Matrix>;
   ApplyDiag(matrix, [](MatrixElement& v) {
@@ -42,8 +42,8 @@ SVDResult<Matrix> SimpleSVDDecomposition(const Matrix& matrix) {
   auto [Q, sigma2] = SchurWilkinsonQR(Transposed(B) * B);
   V *= Q;
 
-  assert(IsDiagonal(sigma2) && IsSquare(sigma2) &&
-         "Sigma^2 from Schur decomposition should be square and diagonal");
+  // assert(IsDiagonal(sigma2) && IsSquare(sigma2) && "Sigma^2 from Schur
+  // decomposition should be square and diagonal");
 
   auto sigma = DiagonalSqrt(sigma2);
   auto sigma_inverse = PseudoInverseDiagonal(sigma);

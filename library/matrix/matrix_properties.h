@@ -36,10 +36,10 @@ bool IsOrthogonal(const Matrix& matrix, long double eps = kDefaultEps) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsDiagonal(const Matrix& matrix) {
+bool IsDiagonal(const Matrix& matrix, long double eps = kDefaultEps) {
   for (auto [row, col] : matrix.MatrixRange()) {
     if (row != col) {
-      if (!IsEpsilonEqualZero(matrix(row, col))) {
+      if (!IsEpsilonEqualZero(matrix(row, col), eps)) {
         return false;
       }
     }
@@ -48,10 +48,10 @@ bool IsDiagonal(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsUpperBidiagonal(const Matrix& matrix) {
+bool IsUpperBidiagonal(const Matrix& matrix, long double eps = kDefaultEps) {
   for (auto [row, col] : matrix.MatrixRange()) {
     if (row != col && row + 1 != col) {
-      if (!IsEpsilonEqualZero(matrix(row, col))) {
+      if (!IsEpsilonEqualZero(matrix(row, col), eps)) {
         return false;
       }
     }
@@ -60,10 +60,10 @@ bool IsUpperBidiagonal(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsUpperTriangular(const Matrix& matrix) {
+bool IsUpperTriangular(const Matrix& matrix, long double eps = kDefaultEps) {
   for (Index row = 0; row < matrix.Rows(); ++row) {
     for (Index col = 0; col < row && col < matrix.Cols(); ++col) {
-      if (!IsEpsilonEqualZero(matrix(row, col))) {
+      if (!IsEpsilonEqualZero(matrix(row, col), eps)) {
         return false;
       }
     }
@@ -72,10 +72,10 @@ bool IsUpperTriangular(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsHessenberg(const Matrix& matrix) {
+bool IsHessenberg(const Matrix& matrix, long double eps = kDefaultEps) {
   for (Index row = 1; row < matrix.Rows(); ++row) {
     for (Index col = 0; col + 1 < row && col < matrix.Cols(); ++col) {
-      if (!IsEpsilonEqualZero(matrix(row, col))) {
+      if (!IsEpsilonEqualZero(matrix(row, col), eps)) {
         return false;
       }
     }
@@ -84,13 +84,13 @@ bool IsHessenberg(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsSymmetric(const Matrix& matrix) {
+bool IsSymmetric(const Matrix& matrix, long double eps = kDefaultEps) {
   if (matrix.Rows() != matrix.Cols()) {
     return false;
   }
   for (Index row = 0; row < matrix.Rows(); ++row) {
     for (Index col = 0; col < matrix.Cols(); ++col) {
-      if (!IsEpsilonEqual(matrix(row, col), matrix(col, row))) {
+      if (!IsEpsilonEqual(matrix(row, col), matrix(col, row), eps)) {
         return false;
       }
     }
