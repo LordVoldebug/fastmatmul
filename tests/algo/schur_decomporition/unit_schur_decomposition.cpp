@@ -16,7 +16,6 @@ TEST(SchurDecompositionSimple, Unit) {
 }
 
 TEST(SchurDecompositionRayleigh, Unit) {
-  // На этой матрице без сдвигов не сходится
   linalg_lib::Matrix<double> A = {
       {2.0, 3.0, 2.0, 2.0, 2.0, 3.0}, {3.0, 2.0, 3.0, 2.0, 2.0, 2.0},
       {2.0, 3.0, 2.0, 3.0, 2.0, 2.0}, {2.0, 2.0, 3.0, 2.0, 3.0, 2.0},

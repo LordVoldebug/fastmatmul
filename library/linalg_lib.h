@@ -9,5 +9,5 @@
 
 #include "algo/bidiagonal_decomposition.h"
 #include "algo/hessenberg_decomposition.h"
-
 #include "algo/schur_decomposition.h"
+#include "algo/svd_decomposition.h"

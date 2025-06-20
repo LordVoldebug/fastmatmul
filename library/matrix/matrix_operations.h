@@ -15,6 +15,16 @@ void Apply(Matrix&& matrix,
   }
 }
 
+template <MutableMatrixOrViewType Matrix>
+void ApplyDiag(
+    Matrix&& matrix,
+    const std::function<void(MatrixElementType<Matrix>&)>& operation) {
+  for (Index index = 0; index < std::min(matrix.Rows(), matrix.Cols());
+       ++index) {
+    operation(matrix(index, index));
+  }
+}
+
 // LHS под UniversalReference чтобы можно было писать что-то вроде
 // A.View().Submatrix(1, 1) += ...
 // очень хотелось бы как нибудь выделить в одно место эти UniversalReferences
@@ -73,12 +83,13 @@ bool operator==(const LMatrix& lhs, const RMatrix& rhs) {
 }
 
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
-bool IsEpsilonEqual(const LMatrix& lhs, const RMatrix& rhs) {
+bool IsEpsilonEqual(const LMatrix& lhs, const RMatrix& rhs,
+                    long double eps = kDefaultEps) {
   if (!DimensionMatches(lhs, rhs)) {
     return false;
   }
   for (auto [row, col] : lhs.MatrixRange()) {
-    if (!IsEpsilonEqual(lhs(row, col), rhs(row, col))) {
+    if (!IsEpsilonEqual(lhs(row, col), rhs(row, col), eps)) {
       return false;
     }
   }

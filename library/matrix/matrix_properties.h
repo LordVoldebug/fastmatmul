@@ -26,13 +26,13 @@ bool IsSquare(const Matrix& matrix) {
 }
 
 template <MatrixOrViewType Matrix>
-bool IsUnit(const Matrix& matrix) {
-  return IsEpsilonEqual(matrix, OwnedMatrix<Matrix>::Unit(matrix.Rows()));
+bool IsUnit(const Matrix& matrix, long double eps = kDefaultEps) {
+  return IsEpsilonEqual(matrix, OwnedMatrix<Matrix>::Unit(matrix.Rows()), eps);
 }
 
 template <MatrixOrViewType Matrix>
-bool IsOrthogonal(const Matrix& matrix) {
-  return IsUnit(Transposed(matrix) * matrix);
+bool IsOrthogonal(const Matrix& matrix, long double eps = kDefaultEps) {
+  return IsUnit(Transposed(matrix) * matrix, eps);
 }
 
 template <MatrixOrViewType Matrix>
