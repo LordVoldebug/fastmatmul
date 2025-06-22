@@ -98,12 +98,6 @@ class Matrix {
     return res;
   }
 
-  // Matrix Transposed() - решил не прокидывать. когда надо можно позвать вьюшку
-  // и transposed на ней.
-  // matrix.Transposed() vs matrix.ConstView().Transposed() -
-  // во втором случае явно читается, что вообще происходит.
-  // А inplace-транспонирование наверное добавить можно
-
   void Transpose() {
     assert(IsSquare(*this) &&
            "Matrix needs to be square to be inplace transposed");

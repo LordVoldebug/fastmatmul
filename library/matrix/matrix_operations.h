@@ -39,6 +39,11 @@ LMatrix&& operator+=(LMatrix&& lhs, const RMatrix& rhs) {
   return lhs;
 }
 
+// А тут тоже непонятно, как без таких Universal references написать
+// чтобы один и тот же код и для MatrixView и для Matrix работал (и не делять
+// неявный cast в  щем случае MatrixView в Matrix допустимым)
+// но вроде во всех случаях получается настолько эффективно насколько можно
+// (по модулю возможно лишних мувов, но для матриц это дешево)
 template <MatrixOrViewType LMatrix, MatrixOrViewType RMatrix>
 OwnedMatrix<LMatrix> operator+(LMatrix&& lhs, const RMatrix& rhs) {
   assert(DimensionMatches(lhs, rhs));
