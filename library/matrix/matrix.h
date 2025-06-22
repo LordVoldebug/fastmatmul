@@ -87,6 +87,21 @@ class Matrix {
     return storage_.InMatrix(row, col);
   }
 
+  // Matrix Transposed() - решил не прокидывать. когда надо можно позвать вьюшку
+  // и transposed на ней.
+  // matrix.Transposed() vs matrix.ConstView().Transposed() -
+  // во втором случае явно читается, что вообще происходит.
+  // А inplace-транспонирование наверное добавить можно
+
+  void Transpose() {
+    assert(IsSquare(*this) && "Matrix needs to be square to be inplace transposed");
+    for (Index row = 0; row < Rows(); ++row) {
+      for (Index col = row + 1; col < Cols(); ++col) {
+        std::swap(*this(row, col), *this(col, row));
+      }
+    }
+  }
+
  private:
   StorageType storage_;
   // Возможно лишняя абстракция, у меня нет сильного мнения

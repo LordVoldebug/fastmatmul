@@ -76,7 +76,7 @@ class MatrixSlice {
   Size rows_ = 0, cols_ = 0;
 };
 
-// Owned - шаблонный в том числе по констаности
+// OwnedMatrixType - шаблонный в том числе по констаности
 // читать лучше начинать с просто MatrixView
 
 
