@@ -146,10 +146,7 @@ LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
 
 template <MatrixOrViewType Matrix>
 OwnedMatrix<Matrix> Transposed(const Matrix& matrix) {
-  OwnedMatrix<Matrix> res(matrix.Cols(), matrix.Rows());
-  for (auto [row, col] : matrix.MatrixRange()) {
-    res(col, row) = matrix(row, col);
-  }
+  OwnedMatrix<Matrix> res{matrix.ConstView().Transposed()};
   return res;
 }
 

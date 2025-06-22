@@ -62,11 +62,13 @@ class Matrix {
   }
 
   MatrixView<Matrix> MutView() {
-    return MatrixView<Matrix>(*this, MatrixSlice::FullMatrixSlice(*this));
+    return MatrixView<Matrix>(*this,
+                              MatrixSlice::FullMatrixSlice(Rows(), Cols()));
   }
 
   MatrixView<const Matrix> ConstView() const {
-    return MatrixView<const Matrix>(*this, MatrixSlice::FullMatrixSlice(*this));
+    return MatrixView<const Matrix>(
+        *this, MatrixSlice::FullMatrixSlice(Rows(), Cols()));
   }
 
   static Matrix Unit(Size rows) {
