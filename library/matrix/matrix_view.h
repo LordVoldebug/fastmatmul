@@ -5,6 +5,77 @@
 namespace linalg_lib {
 // TODO может быть поддержать транспониированную вьюшку?
 // Но как нибудь потом...
+
+class MatrixSlice {
+ public:
+  MatrixSlice(Index start_row, Index start_col, Size rows, Size cols)
+      : start_row_(start_row),
+        start_col_(start_col),
+        rows_(rows),
+        cols_(cols) {
+    // На этом моменте начинаешь задумываться про Strong Type Aliassing....
+    // Но чот мне кажется будет неудобно очень...
+    assert(rows_ >= 0 && "MatrixSlice row count need to be non negative");
+    assert(cols_ >= 0 && "MatrixSlice column count need to be non negative");
+    assert(start_row_ >= 0 && "MatrixSlice start row needs to be non negative");
+    assert(start_col_ >= 0 &&
+           "MatrixSlice start column need to be non negative");
+  }
+
+  template <MatrixType Matrix>  // только для матриц, потому что для MatrixView
+  // будет ломать логику, выдавать подматрицу не относительно того что надо
+  static MatrixSlice FullMatrixSlice(const Matrix& matrix) {
+    return MatrixSlice(Index{0}, Index{0}, matrix.Rows(), matrix.Cols());
+  }
+
+  Size Rows() const {
+    return rows_;
+  }
+
+  Size Cols() const {
+    return cols_;
+  }
+
+  Index StartRow() const {
+    return start_row_;
+  }
+
+  Index StartCol() const {
+    return start_col_;
+  }
+
+  MatrixSlice SubMatrix(Index start_row, Index start_col, Size rows,
+                        Size cols) const {
+    assert(rows >= 0 && "SubMatrix row count need to be non negative");
+    assert(cols >= 0 && "SubMatrix column count need to be non negative");
+
+    // Эти два слайса не относительно исходной матрицы, а относительно слайса
+    // уже
+
+    MatrixSlice base_slice{Index{0}, Index{0}, Rows(), Cols()};
+    MatrixSlice inner_slice{start_row, start_col, rows, cols};
+    inner_slice.AssertContainedIn(base_slice);
+
+    return MatrixSlice(start_row_ + start_row, start_col_ + start_col, rows,
+                       cols);
+  }
+
+  void AssertContainedIn(const MatrixSlice& base) const {
+    assert(0 <= start_row_ && start_row_ <= base.Rows() &&
+           "MatrixSlice start row out of bounds");
+    assert(0 <= start_col_ && start_col_ <= base.Cols() &&
+           "MatrixSlice start column out of bounds");
+    assert(0 <= start_row_ + rows_ && start_row_ + rows_ <= base.Rows() &&
+           "MatrixSlice end row out of bounds");
+    assert(0 <= start_col_ + cols_ && start_col_ + cols_ <= base.Cols() &&
+           "MatrixSlice end column out of bounds");
+  }
+
+ private:
+  Index start_row_ = 0, start_col_ = 0;
+  Size rows_ = 0, cols_ = 0;
+};
+
 template <OwnedMatrixType BaseMatrix>
 class MatrixView {
  public:
@@ -15,76 +86,40 @@ class MatrixView {
   // хочу сделать этот конструктор деталью реализации, чтобы
   // со стороны всегда View создавалась через методы матрицы
   // сделать конструктор private и объявить freind показалось хорошей идеей
-  // тут...
 
   friend RawMatrixType;
 
-  MatrixView(BaseMatrix& matrix, Size start_row, Size start_col, Size rows,
-             Size cols)
+  MatrixView(BaseMatrix& matrix, MatrixSlice slice)
       : matrix_(matrix),
-        start_row_(start_row),
-        start_col_(start_col),
-        rows_(rows),
-        cols_(cols) {
-    // На этом моменте начинаешь задумываться про Strong Type Aliassing....
-    // Но чот мне кажется будет неудобно очень...
-    assert(rows_ >= 0 && "MatrixView row count need to be non negative");
-    assert(cols_ >= 0 && "MatrixView column count need to be non negative");
-    assert(0 <= start_row_ && start_row_ <= matrix_.get().Rows() &&
-           "MatrixView start row out of bounds");
-    assert(0 <= start_col_ && start_col_ <= matrix_.get().Cols() &&
-           "MatrixView start column out of bounds");
-    assert(0 <= start_row_ + rows_ &&
-           start_row_ + rows_ <= matrix_.get().Rows() &&
-           "MatrixView end row out of bounds");
-    assert(0 <= start_col_ + cols_ &&
-           start_col_ + cols_ <= matrix_.get().Cols() &&
-           "MatrixView end column out of bounds");
+        slice_(slice) {
+    slice.AssertContainedIn(MatrixSlice::FullMatrixSlice(matrix));
   }
 
  public:
   decltype(auto) operator()(this auto&& self, Index row, Index col) {
-    assert(0 <= row && row < self.Rows() && "Matrix indices out of bounds");
-    assert(0 <= col && col < self.Cols() && "Matrix indices out of bounds");
+    assert(0 <= row && row < self.Rows() && "MatrixView indices out of bounds");
+    assert(0 <= col && col < self.Cols() && "MatrixView indices out of bounds");
 
-    return self.matrix_.get()(row + self.start_row_, col + self.start_col_);
+    return self.matrix_.get()(row + self.slice_.StartRow(),
+                              col + self.slice_.StartCol());
   }
 
   MatrixView<RawMatrixType> MutView() {
-    return MatrixView<RawMatrixType>(matrix_.get(), Index{0}, Index{0}, Rows(),
-                                     Cols());
+    return MatrixView<RawMatrixType>(matrix_.get(), slice_);
   }
 
   MatrixView<const RawMatrixType> ConstView() const {
-    return MatrixView<const RawMatrixType>(matrix_.get(), start_row_,
-                                           start_col_, rows_, cols_);
-  }
-
-  MatrixView SubMatrix(Index start_row, Index start_col) {
-    assert(0 <= start_row && start_row <= Rows() &&
-           "SubMatrix start row out of bounds");
-    assert(0 <= start_col && start_col <= Cols() &&
-           "SubMatrix start column out of bounds");
-    return SubMatrix(start_row, start_col, Rows() - start_row,
-                     Cols() - start_col);
+    return MatrixView<const RawMatrixType>(matrix_.get(), slice_);
   }
 
   MatrixView SubMatrix(Index start_row, Index start_col, Size rows, Size cols) {
-    assert(rows >= 0 && "SubMatrix row count need to be non negative");
-    assert(cols >= 0 && "SubMatrix column count need to be non negative");
-    assert(0 <= start_row && start_row <= Rows() &&
-           "SubMatrix start row out of bounds");
-    assert(0 <= start_col && start_col <= Cols() &&
-           "SubMatrix start column out of bounds");
-    assert(0 <= start_row + rows && start_row + rows <= Rows() &&
-           "SubMatrix end row out of bounds");
-    assert(0 <= start_col + cols && start_col + cols <= Cols() &&
-           "SubMatrix end column out of bounds");
-    // Мне не нравятся эти цепочки ассертов, но как их вынести сохранив
-    // читаемость я не придумал (условно, LiesWithin внешней функцией
-    // имхо менее читаемо (какой параметр есть кто?)
-    return MatrixView(matrix_.get(), start_row_ + start_row,
-                      start_col_ + start_col, rows, cols);
+    return MatrixView(matrix_.get(),
+                      slice_.SubMatrix(start_row, start_col, rows, cols));
+  }
+
+  MatrixView SubMatrix(Index start_row, Index start_col) {
+    return SubMatrix(start_row, start_col, Rows() - start_row,
+                     Cols() - start_col);
   }
 
   MatrixView Row(Index row) {
@@ -111,20 +146,21 @@ class MatrixView {
   }
 
   Size Rows() const {
-    return rows_;
+    return slice_.Rows();
   }
 
   Size Cols() const {
-    return cols_;
+    return slice_.Cols();
   }
 
+  // Внутрь слайса не занести: Range это ответсвенность исходной матрицы
+  // Хоть в текущем виде и можно было бы тип вынести так как общий, но плохо
   MatrixRangeType MatrixRange() const {
-    return MatrixRangeType(rows_, cols_);
+    return MatrixRangeType(Rows(), Cols());
   }
 
  private:
   std::reference_wrapper<BaseMatrix> matrix_;
-  Size start_row_ = 0, start_col_ = 0;
-  Size rows_ = 0, cols_ = 0;
+  MatrixSlice slice_;
 };
 }  // namespace linalg_lib

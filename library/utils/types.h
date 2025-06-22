@@ -27,6 +27,8 @@ concept MatrixType = InstanceOf<Matrix, T>;
 template <typename T>
 concept OwnedMatrixType = MatrixType<T> && !std::is_reference_v<T>;
 
+class MatrixSlice;
+
 template <OwnedMatrixType Matrix>
 class MatrixView;
 

@@ -29,7 +29,7 @@ class HouseholderReflection {
     return householder_vector_.Rows();
   }
 
-  Size Cols() const { // для частичной семантики линейного преоброзавания
+  Size Cols() const {  // для частичной семантики линейного преоброзавания
     // чтобы assert DimensionMultiplicationMatches писать, а то думать надо
     return householder_vector_.Rows();
   }

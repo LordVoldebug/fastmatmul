@@ -4,6 +4,7 @@
 #include "utils/types.h"
 #include "matrix_properties.h"
 #include "matrix_operations.h"
+#include "matrix_view.h"
 
 namespace linalg_lib {
 template <Numeric MatrixElement>
@@ -34,10 +35,10 @@ class Matrix {
   }
 
   Matrix(std::initializer_list<std::initializer_list<MatrixElement>> data)
-    : Matrix(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
+      : Matrix(data.size(), data.size() == 0 ? 0 : data.begin()->size()) {
     for (Index row = 0; row < storage_.Rows(); ++row) {
       assert(data.begin()[row].size() == storage_.Cols() &&
-          "Initializer row sizes need to match");
+             "Initializer row sizes need to match");
       for (Index col = 0; col < storage_.Cols(); ++col) {
         (*this)(row, col) = data.begin()[row].begin()[col];
       }
@@ -61,11 +62,11 @@ class Matrix {
   }
 
   MatrixView<Matrix> MutView() {
-    return MatrixView<Matrix>(*this, Index{0}, Index{0}, Rows(), Cols());
+    return MatrixView<Matrix>(*this, MatrixSlice::FullMatrixSlice(*this));
   }
 
   MatrixView<const Matrix> ConstView() const {
-    return MatrixView<const Matrix>(*this, Index{0}, Index{0}, Rows(), Cols());
+    return MatrixView<const Matrix>(*this, MatrixSlice::FullMatrixSlice(*this));
   }
 
   static Matrix Unit(Size rows) {
