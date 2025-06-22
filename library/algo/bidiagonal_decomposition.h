@@ -30,13 +30,13 @@ BidiagonalizationResult<Matrix> BidiagonalDecomposition(const Matrix& matrix) {
     auto b_cols_view = b_converge.MutView().SubMatrix(0, col + 1);
     auto v_cols_view = v_preifx.MutView().SubMatrix(0, col + 1);
 
-    auto to_zero_row = Transposed(b_cols_view.Row(col));
+    auto to_zero_row = b_cols_view.Row(col).Transposed();
     auto cols_transformation =
         detail::HouseholderReflection<Matrix>(to_zero_row);
 
     cols_transformation.ApplyRight(b_cols_view);
     cols_transformation.ApplyRight(v_cols_view);
   }
-  return {Transposed(ut_suffix), b_converge, v_preifx};
+  return {ut_suffix.Transposed(), b_converge, v_preifx};
 }
 }  // namespace linalg_lib

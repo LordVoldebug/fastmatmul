@@ -32,7 +32,7 @@ bool IsUnit(const Matrix& matrix, long double eps = kDefaultEps) {
 
 template <MatrixOrViewType Matrix>
 bool IsOrthogonal(const Matrix& matrix, long double eps = kDefaultEps) {
-  return IsUnit(Transposed(matrix) * matrix, eps);
+  return IsUnit(matrix.ConstView().Transposed() * matrix, eps);
 }
 
 template <MatrixOrViewType Matrix>

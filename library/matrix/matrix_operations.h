@@ -144,12 +144,6 @@ LMatrix&& operator*=(LMatrix&& lhs, const RMatrix& rhs) {
   return lhs;
 }
 
-template <MatrixOrViewType Matrix>
-OwnedMatrix<Matrix> Transposed(const Matrix& matrix) {
-  OwnedMatrix<Matrix> res{matrix.ConstView().Transposed()};
-  return res;
-}
-
 template <MutableMatrixOrViewType Matrix>
 Matrix&& operator*=(Matrix&& matrix, MatrixElementType<Matrix> value) {
   Apply(matrix, [value](MatrixElementType<Matrix>& v) {

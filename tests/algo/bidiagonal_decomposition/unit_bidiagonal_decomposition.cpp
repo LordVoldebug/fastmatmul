@@ -13,5 +13,5 @@ TEST(BidiogonalDecomosition, Unit) {
   EXPECT_TRUE(linalg_lib::IsOrthogonal(U));
   EXPECT_TRUE(linalg_lib::IsUpperBidiagonal(B));
   EXPECT_TRUE(linalg_lib::IsOrthogonal(V));
-  EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, U * B * Transposed(V)));
+  EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, U * B * V.Transposed()));
 }

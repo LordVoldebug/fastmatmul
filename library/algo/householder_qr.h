@@ -27,6 +27,6 @@ QRResult<Matrix> HouseholderQR(const Matrix& matrix) {
     transformation.ApplyLeft(r_rows_view);
     transformation.ApplyLeft(qt_rows_view);
   }
-  return {Transposed(qt_suffix), r_converge};
+  return {qt_suffix.Transposed(), r_converge};
 }
 }  // namespace linalg_lib

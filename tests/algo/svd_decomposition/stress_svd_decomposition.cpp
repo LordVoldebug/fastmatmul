@@ -17,6 +17,7 @@ TEST_F(RandomDoubleMatrix, SVDDecomposition) {
     EXPECT_TRUE(linalg_lib::IsOrthogonal(U, 1e-1));
     EXPECT_TRUE(linalg_lib::IsOrthogonal(V));
     EXPECT_TRUE(linalg_lib::IsDiagonal(Sigma, 1e-1));
-    EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, U * Sigma * Transposed(V), 1e-1));
+    EXPECT_TRUE(
+        linalg_lib::IsEpsilonEqual(A, U * Sigma * V.Transposed(), 1e-1));
   }
 }

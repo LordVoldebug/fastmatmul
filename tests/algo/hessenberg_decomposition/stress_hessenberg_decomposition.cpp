@@ -13,7 +13,7 @@ TEST_F(RandomDoubleMatrix, HessenbergDecomposition) {
 
     auto [Q, H] = linalg_lib::HessenbergDecomposition(A);
     EXPECT_TRUE(linalg_lib::IsOrthogonal(Q));
-    EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * H * Transposed(Q)));
+    EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, Q * H * Q.Transposed()));
     EXPECT_TRUE(linalg_lib::IsHessenberg(H));
   }
 }

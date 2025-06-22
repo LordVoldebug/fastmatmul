@@ -20,6 +20,6 @@ QRResult<Matrix> GivensQR(const Matrix& matrix) {
       transformation.ApplyLeft(qt_suffix);
     }
   }
-  return {Transposed(qt_suffix), r_converge};
+  return {qt_suffix.Transposed(), r_converge};
 }
 }  // namespace linalg_lib

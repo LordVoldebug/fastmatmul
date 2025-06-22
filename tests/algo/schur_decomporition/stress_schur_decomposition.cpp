@@ -12,7 +12,7 @@ TEST_F(RandomDoubleMatrix, SchurDecompositionRayleigh) {
     auto A = generator.GenerateSquareSymmetric(kMatrixSize);
 
     auto [Q, R] = SchurRayleighQR(A);
-    EXPECT_TRUE(IsEpsilonEqual(Q * R * Transposed(Q), A));
+    EXPECT_TRUE(IsEpsilonEqual(Q * R * Q.Transposed(), A));
     EXPECT_TRUE(linalg_lib::IsOrthogonal(Q));
     EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
   }
@@ -27,7 +27,7 @@ TEST_F(RandomDoubleMatrix, SchurDecompositionWilkinson) {
     auto A = generator.GenerateSquareSymmetric(kMatrixSize);
 
     auto [Q, R] = linalg_lib::SchurWilkinsonQR(A);
-    EXPECT_TRUE(IsEpsilonEqual(Q * R * Transposed(Q), A));
+    EXPECT_TRUE(IsEpsilonEqual(Q * R * Q.Transposed(), A));
     EXPECT_TRUE(linalg_lib::IsOrthogonal(Q));
     EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
   }

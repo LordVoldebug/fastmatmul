@@ -39,7 +39,7 @@ Matrix PseudoInverseDiagonal(Matrix matrix) {
 template <MatrixType Matrix>
 SVDResult<Matrix> SimpleSVDDecomposition(const Matrix& matrix) {
   auto [U, B, V] = BidiagonalDecomposition(matrix);
-  auto [Q, sigma2] = SchurWilkinsonQR(Transposed(B) * B);
+  auto [Q, sigma2] = SchurWilkinsonQR(B.ConstView().Transposed() * B);
   V *= Q;
 
   // assert(IsDiagonal(sigma2) && IsSquare(sigma2) && "Sigma^2 from Schur

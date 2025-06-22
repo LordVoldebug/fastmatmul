@@ -281,7 +281,7 @@ TEST(MatrixViewTranspose, FullSubEmpty) {
         {1, 2, 3},
         {4, 5, 6},
     };
-    auto T = linalg_lib::Transposed(A.ConstView());
+    auto T = A.ConstView().Transposed();
     linalg_lib::Matrix<int> expected = {
         {1, 4},
         {2, 5},
@@ -294,7 +294,7 @@ TEST(MatrixViewTranspose, FullSubEmpty) {
         {1, 2, 3},
         {4, 5, 6},
     };
-    auto T = Transposed(A.ConstView().SubMatrix(0, 1, 2, 2));
+    auto T = A.ConstView().SubMatrix(0, 1, 2, 2).Transposed();
     linalg_lib::Matrix<int> expected = {
         {2, 5},
         {3, 6},
@@ -303,7 +303,7 @@ TEST(MatrixViewTranspose, FullSubEmpty) {
   }
   {
     linalg_lib::Matrix<int> A(0, 0);
-    auto T = Transposed(A);
+    auto T = A.Transposed();
     EXPECT_EQ(T.Rows(), 0);
     EXPECT_EQ(T.Cols(), 0);
   }

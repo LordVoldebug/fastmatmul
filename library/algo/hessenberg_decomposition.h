@@ -24,6 +24,6 @@ HessenbergResult<Matrix> HessenbergDecomposition(const Matrix& matrix) {
 
     transformation.ApplyLeft(qt_rows_view);
   }
-  return {Transposed(qt_suffix), h_converge};
+  return {qt_suffix.Transposed(), h_converge};
 }
 }  // namespace linalg_lib

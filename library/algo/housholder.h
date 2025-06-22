@@ -9,7 +9,7 @@ namespace linalg_lib::detail {
 template <MatrixOrViewType MatrixType>
 MatrixElementType<MatrixType> VectorNorm(const MatrixType& vector) {
   assert(vector.Cols() == 1 && "VectorNorm vector needs to be a vector");
-  return std::sqrt((Transposed(vector) * vector)(0, 0));
+  return std::sqrt((vector.ConstView().Transposed() * vector)(0, 0));
 }
 
 template <OwnedMatrixType Matrix>
@@ -39,8 +39,8 @@ class HouseholderReflection {
     assert(DimensionMultiplicationMatches(*this, matrix) &&
            "Householder reflection dimension does not match with matrix "
            "dimension");
-    matrix -=
-        householder_vector_ * 2 * (Transposed(householder_vector_) * matrix);
+    matrix -= householder_vector_ * 2 *
+              (householder_vector_.ConstView().Transposed() * matrix);
   }
 
   template <MutableMatrixOrViewType MatrixType>
@@ -48,8 +48,8 @@ class HouseholderReflection {
     assert(DimensionMultiplicationMatches(matrix, *this) &&
            "Householder reflection dimension does not match with matrix "
            "dimension");
-    matrix -=
-        matrix * householder_vector_ * 2 * Transposed(householder_vector_);
+    matrix -= matrix * householder_vector_ * 2 *
+              householder_vector_.ConstView().Transposed();
   }
 
  private:

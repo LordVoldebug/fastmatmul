@@ -87,6 +87,17 @@ class Matrix {
     return storage_.InMatrix(row, col);
   }
 
+  // Логика такая: пусть Transposed от матрицы возвращаем матрицу, от вьюшки -
+  // вьюшку Всегда возвращать вьюшку мне субъективно нравится меньше, иногда
+  // касты неприятные нужно будет делать в Matrix. Если надо получить именно
+  // вьюшку, то matrix.ConstView().Transposed() и явно читается, что именно
+  // происходит
+
+  Matrix Transposed() {
+    Matrix res{ConstView().Transposed()};
+    return res;
+  }
+
   // Matrix Transposed() - решил не прокидывать. когда надо можно позвать вьюшку
   // и transposed на ней.
   // matrix.Transposed() vs matrix.ConstView().Transposed() -
@@ -94,7 +105,9 @@ class Matrix {
   // А inplace-транспонирование наверное добавить можно
 
   void Transpose() {
-    assert(IsSquare(*this) && "Matrix needs to be square to be inplace transposed");
+    assert(IsSquare(*this) &&
+           "Matrix needs to be square to be inplace transposed");
+    // из логики, что inplace-операции у нас сохраняют размерности матрицы
     for (Index row = 0; row < Rows(); ++row) {
       for (Index col = row + 1; col < Cols(); ++col) {
         std::swap(*this(row, col), *this(col, row));
