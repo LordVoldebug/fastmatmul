@@ -89,14 +89,12 @@ class MatrixView {
 
   MatrixView Row(Index row) {
     assert(0 <= row && row < Rows() && "Matrix row index out of bounds");
-    return MatrixView(matrix_.get(), start_row_ + row, start_col_, Size{1},
-                      Cols());
+    return SubMatrix(row, 0, Size{1}, Cols());
   }
 
   MatrixView Col(Index col) {
     assert(0 <= col && col < Cols() && "Matrix column index out of bounds");
-    return MatrixView(matrix_.get(), start_row_, start_col_ + col, Rows(),
-                      Size{1});
+    return SubMatrix(0, col, Rows(), Size{1});
   }
 
   template <MatrixOrViewType Matrix>
