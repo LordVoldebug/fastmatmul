@@ -18,3 +18,5 @@ TEST_F(RandomDoubleMatrix, Bidiagonalization) {
     EXPECT_TRUE(linalg_lib::IsEpsilonEqual(A, U * B * V.Transposed()));
   }
 }
+
+// TODO нормальные стресс тесты

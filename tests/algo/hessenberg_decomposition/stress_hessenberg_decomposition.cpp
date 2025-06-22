@@ -17,3 +17,5 @@ TEST_F(RandomDoubleMatrix, HessenbergDecomposition) {
     EXPECT_TRUE(linalg_lib::IsHessenberg(H));
   }
 }
+
+// TODO нормальные стресс тесты

@@ -32,3 +32,4 @@ TEST_F(RandomDoubleMatrix, SchurDecompositionWilkinson) {
     EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
   }
 }
+// TODO нормальные стресс тесты

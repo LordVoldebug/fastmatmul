@@ -32,3 +32,5 @@ TEST_F(RandomDoubleMatrix, HouseholderQR) {
     EXPECT_TRUE(linalg_lib::IsUpperTriangular(R));
   }
 }
+
+// TODO нормальные стресс тесты
